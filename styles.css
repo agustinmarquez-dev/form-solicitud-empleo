@@ -1,0 +1,928 @@
+/* ══════════════════════════════════════════════════════════════
+   ATS Gastronómico — styles.css
+   Mobile-first | Dark premium | Red + Gold accent
+   Paleta: fondo oscuro · rojo #d42020 · gold #c9953a
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. VARIABLES ── */
+:root {
+  /* Backgrounds */
+  --bg:         #0b0b0f;
+  --bg-surface: #13131a;
+  --bg-raised:  #1b1b24;
+  --bg-hover:   #21212d;
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.07);
+  --border-focus: rgba(255, 255, 255, 0.18);
+
+  /* Brand */
+  --red:       #d42020;
+  --red-dark:  #a61919;
+  --red-light: #e83434;
+  --red-glow:  rgba(212, 32, 32, 0.14);
+
+  --gold:      #c9953a;
+  --gold-lt:   #e0b050;
+  --gold-glow: rgba(201, 149, 58, 0.12);
+
+  /* Text */
+  --t1: #f0efe8;
+  --t2: #8a8a9e;
+  --t3: #474758;
+
+  /* Semantic */
+  --warn: rgba(212, 32, 32, 0.1);
+  --warn-border: rgba(212, 32, 32, 0.3);
+
+  /* Quiz accent colors */
+  --qa1: #b92b2b;  /* red   — completamente en desacuerdo */
+  --qa2: #1f6ea8;  /* blue  — en desacuerdo */
+  --qa3: #c46010;  /* amber — de acuerdo */
+  --qa4: #197a36;  /* green — completamente de acuerdo */
+
+  /* Spacing */
+  --s1: 0.375rem;
+  --s2: 0.625rem;
+  --s3: 1rem;
+  --s4: 1.5rem;
+  --s5: 2rem;
+  --s6: 3rem;
+
+  /* Layout */
+  --header-h:    64px;
+  --progress-h:  3px;
+  --indicator-h: 34px;
+  --nav-h:       72px;
+  --max-w:       520px;
+
+  /* Radii */
+  --r-sm:  8px;
+  --r-md:  12px;
+  --r-lg:  16px;
+  --r-xl:  22px;
+  --r-pill: 999px;
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --t-fast: 0.14s ease;
+  --t-base: 0.24s ease;
+  --t-slow: 0.38s var(--ease-out);
+
+  /* Typography */
+  --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
+          'Segoe UI', Arial, sans-serif;
+}
+
+/* ── 2. RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--t1);
+  line-height: 1.55;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img { display: block; max-width: 100%; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ── 3. APP SHELL ── */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: var(--max-w);
+  margin: 0 auto;
+  position: relative;
+
+  /* Luz ambiental sutil desde arriba */
+  background:
+    radial-gradient(ellipse 90% 35% at 50% 0%,
+      rgba(212, 32, 32, 0.07) 0%,
+      transparent 60%
+    ),
+    var(--bg);
+}
+
+/* ── 4. HEADER ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: 0 var(--s4);
+  height: var(--header-h);
+  background: rgba(11, 11, 15, 0.92);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.header-logos {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-shrink: 0;
+}
+
+.logo {
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logo--sabores {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+}
+
+.logo--ext {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+}
+
+.logo-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+}
+
+.header-text { flex: 1; min-width: 0; }
+
+.header-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--t1);
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.header-sub {
+  font-size: 0.7rem;
+  color: var(--t2);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── 5. PROGRESS BAR ── */
+.progress-wrap {
+  height: var(--progress-h);
+  background: var(--bg-raised);
+  position: sticky;
+  top: var(--header-h);
+  z-index: 29;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  border-radius: 0 var(--r-pill) var(--r-pill) 0;
+  transition: width var(--t-slow);
+}
+
+/* ── 6. STEP INDICATOR ── */
+.step-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 var(--s4);
+  height: var(--indicator-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: calc(var(--header-h) + var(--progress-h));
+  z-index: 28;
+}
+
+.step-ind-cur {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.step-ind-name {
+  font-size: 0.7rem;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── 7. FORM MAIN ── */
+.form-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: var(--s4);
+  padding-bottom: calc(var(--nav-h) + var(--s5));
+}
+
+/* ── 8. FORM STEPS — sistema de transición ── */
+.form-step {
+  display: none;
+}
+
+.form-step.is-active {
+  display: block;
+  animation: stepIn var(--t-slow) forwards;
+}
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 9. STEP HEADER ── */
+.step-header {
+  margin-bottom: var(--s5);
+}
+
+.step-title {
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--t1);
+  line-height: 1.15;
+}
+
+.step-sub {
+  font-size: 0.875rem;
+  color: var(--t2);
+  margin-top: var(--s1);
+}
+
+/* ── 10. CONFIG PANEL ── */
+.config-panel {
+  background: rgba(201, 149, 58, 0.05);
+  border: 1px solid rgba(201, 149, 58, 0.18);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.config-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: var(--s2);
+  cursor: default;
+}
+
+.config-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(201, 149, 58, 0.25);
+  border-radius: var(--r-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--t1);
+  outline: none;
+  transition: border-color var(--t-fast);
+}
+
+.config-input:focus {
+  border-color: var(--gold);
+}
+
+.config-input::placeholder { color: var(--t3); }
+
+/* ── 11. FIELD LAYOUT ── */
+.field {
+  margin-bottom: var(--s4);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+}
+
+.field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--t2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--s2);
+}
+
+.req { color: var(--red); margin-left: 2px; }
+
+.field-hint {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--t3);
+  margin-top: 5px;
+}
+
+.field-desc {
+  font-size: 0.825rem;
+  color: var(--t2);
+  line-height: 1.55;
+  margin-bottom: var(--s2);
+  font-style: italic;
+}
+
+/* ── 12. INPUTS ── */
+.field-input {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: var(--t1);
+  outline: none;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  line-height: 1.4;
+}
+
+.field-input::placeholder { color: var(--t3); }
+
+.field-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+.field-input.is-error {
+  border-color: var(--red-light);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+
+/* Ocultar flechas en input number */
+.field-input[type="number"]::-webkit-inner-spin-button,
+.field-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+.field-input[type="number"] { -moz-appearance: textfield; }
+
+/* ── 13. SECTION SEPARATOR ── */
+.section-sep {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin: var(--s5) 0 var(--s4);
+}
+
+.section-sep::before,
+.section-sep::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-sep-lbl {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+/* ── 14. OPTION BUTTONS (radio-style) ── */
+.opt-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--t-fast),
+    background    var(--t-fast),
+    box-shadow    var(--t-fast),
+    transform     var(--t-fast);
+}
+
+/* Línea de acento izquierda */
+.opt-btn::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: 0 2px 2px 0;
+  transition: background var(--t-fast);
+}
+
+.opt-btn:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-hover);
+}
+
+.opt-btn:active { transform: scale(0.985); }
+
+.opt-btn.is-sel {
+  border-color: var(--red);
+  background: rgba(212, 32, 32, 0.06);
+  box-shadow: 0 0 0 1px rgba(212, 32, 32, 0.2);
+}
+
+.opt-btn.is-sel::before { background: var(--red); }
+
+/* Indicador circular */
+.opt-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--t3);
+  flex-shrink: 0;
+  position: relative;
+  transition: border-color var(--t-fast);
+}
+
+.opt-btn.is-sel .opt-dot {
+  border-color: var(--red);
+  background: var(--red);
+}
+
+.opt-btn.is-sel .opt-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.opt-lbl {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--t1);
+  line-height: 1.4;
+}
+
+.opt-btn.is-sel .opt-lbl { color: #fff; }
+
+/* ── 15. CHECKBOX GROUP ── */
+.check-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.check-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-raised);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+/* Input real oculto pero accesible */
+.check-opt input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.check-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--t3);
+  flex-shrink: 0;
+  position: relative;
+  transition: all var(--t-fast);
+  background: transparent;
+}
+
+/* Checkmark via CSS */
+.check-opt.is-checked .check-box {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.check-opt.is-checked .check-box::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(44deg);
+}
+
+.check-opt.is-checked {
+  border-color: var(--red);
+  background: rgba(212, 32, 32, 0.06);
+}
+
+.check-lbl {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+/* ── 16. BADGES Y ADVERTENCIAS ── */
+.badge-excl {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(212, 32, 32, 0.12);
+  color: #ff7070;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.07em;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.excl-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  background: var(--warn);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin-top: var(--s2);
+  font-size: 0.85rem;
+  color: #ff8585;
+  line-height: 1.5;
+  animation: stepIn var(--t-base) forwards;
+}
+
+/* Error inline de paso */
+.step-error {
+  display: none;
+  background: var(--warn);
+  border: 1px solid var(--warn-border);
+  border-radius: var(--r-md);
+  padding: var(--s3);
+  margin-bottom: var(--s3);
+  font-size: 0.85rem;
+  color: #ff8585;
+  animation: stepIn var(--t-base) forwards;
+}
+
+.step-error.is-visible { display: block; }
+
+/* ── 17. QUIZ ── */
+
+.quiz-header { margin-bottom: var(--s4); }
+
+.quiz-progress-track {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  margin-bottom: var(--s3);
+}
+
+.quiz-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--red), var(--gold));
+  border-radius: var(--r-pill);
+  transition: width 0.45s var(--ease-out);
+}
+
+.quiz-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--s3);
+}
+
+.quiz-counter {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.quiz-tag {
+  font-size: 0.68rem;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.quiz-title {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--t2);
+  line-height: 1.55;
+}
+
+.quiz-body { margin-bottom: var(--s5); }
+
+.quiz-question {
+  font-size: clamp(1rem, 3.5vw, 1.2rem);
+  font-weight: 600;
+  color: var(--t1);
+  line-height: 1.5;
+  margin-bottom: var(--s4);
+  min-height: 3rem;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Grid 2×2 de respuestas */
+.quiz-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+}
+
+.quiz-ans {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  padding: 1rem 0.625rem;
+  min-height: 88px;
+  border-radius: var(--r-lg);
+  border: 2px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: filter var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.quiz-ans:active { transform: scale(0.96); }
+.quiz-ans:hover  { filter: brightness(1.08); }
+
+/* Colores individuales */
+.quiz-ans--1 { background: var(--qa1); }
+.quiz-ans--2 { background: var(--qa2); }
+.quiz-ans--3 { background: var(--qa3); }
+.quiz-ans--4 { background: var(--qa4); }
+
+/* Seleccionada: borde blanco */
+.quiz-ans.is-picked {
+  border-color: rgba(255, 255, 255, 0.85);
+  filter: brightness(1.12);
+}
+
+/* Bloqueadas tras responder */
+.quiz-ans.is-off {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+.quiz-ans.is-picked.is-off {
+  opacity: 1;
+  pointer-events: none;
+}
+
+.quiz-shape {
+  font-size: 1.2rem;
+  line-height: 1;
+  display: block;
+}
+
+.quiz-footer { margin-top: var(--s3); }
+
+.btn-quiz-next {
+  width: 100%;
+  background: var(--red);
+  color: #fff;
+  border-radius: var(--r-md);
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+
+.btn-quiz-next:hover  { background: var(--red-light); }
+.btn-quiz-next:active { background: var(--red-dark); transform: scale(0.99); }
+
+/* ── 18. NAV STICKY ── */
+.form-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-w);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s3) var(--s4);
+  padding-bottom: calc(var(--s3) + env(safe-area-inset-bottom, 0px));
+  background: rgba(11, 11, 15, 0.96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 40;
+  height: var(--nav-h);
+}
+
+.btn-back {
+  flex-shrink: 0;
+  min-width: 88px;
+  background: var(--bg-raised);
+  color: var(--t2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all var(--t-fast);
+}
+
+.btn-back:hover  { border-color: var(--border-focus); color: var(--t1); }
+.btn-back:active { transform: scale(0.98); }
+
+.btn-next {
+  flex: 1;
+  background: var(--red);
+  color: #fff;
+  border-radius: var(--r-md);
+  padding: 0.875rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+
+.btn-next:hover  { background: var(--red-light); }
+.btn-next:active { background: var(--red-dark); transform: scale(0.99); }
+.btn-next:disabled {
+  background: var(--bg-raised);
+  color: var(--t3);
+  cursor: not-allowed;
+}
+
+/* ── 19. PANTALLA DE GRACIAS ── */
+.thanks-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--s5) 0 var(--s6);
+  gap: var(--s3);
+}
+
+.thanks-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s3);
+  margin-bottom: var(--s2);
+}
+
+/* Logo en pantalla de gracias: ligeramente más grandes */
+.thanks-logos .logo--sabores { width: 52px; height: 52px; }
+.thanks-logos .logo--ext     { width: 46px; height: 46px; }
+
+.thanks-icon {
+  font-size: 3.25rem;
+  line-height: 1;
+  animation: popIn 0.45s var(--ease-spring) forwards;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.thanks-title {
+  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--t1);
+  line-height: 1.15;
+}
+
+.thanks-msg {
+  font-size: 0.9375rem;
+  color: var(--t2);
+  line-height: 1.65;
+  max-width: 290px;
+}
+
+.btn-exit {
+  margin-top: var(--s3);
+  background: var(--bg-raised);
+  color: var(--t1);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 0.875rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all var(--t-fast);
+}
+
+.btn-exit:hover  { background: var(--bg-hover); border-color: var(--border-focus); }
+.btn-exit:active { transform: scale(0.98); }
+
+/* ── 20. UTILIDADES ── */
+[hidden] { display: none !important; }
+
+/* ── 21. RESPONSIVE — mejoras desktop ── */
+@media (max-width: 380px) {
+  /* Dos columnas demasiado estrechas en pantallas muy pequeñas */
+  .field-row { grid-template-columns: 1fr; }
+  .quiz-answers { grid-template-columns: 1fr 1fr; } /* mantener 2×2 en quiz */
+  .quiz-ans { min-height: 78px; font-size: 0.75rem; }
+}
+
+@media (min-width: 600px) {
+  .form-main {
+    padding: var(--s5);
+    padding-bottom: calc(var(--nav-h) + var(--s5));
+  }
+
+  .step-title,
+  .thanks-title { font-size: 2.2rem; }
+
+  .opt-btn,
+  .check-opt { padding: 1rem 1.25rem; }
+
+  .field-input { padding: 1rem 1.1rem; }
+
+  .quiz-ans { min-height: 100px; padding: 1.1rem 0.75rem; }
+}
+
+@media (min-width: 600px) and (min-height: 700px) {
+  /* Más aire vertical en pantallas grandes */
+  .field { margin-bottom: var(--s5); }
+}

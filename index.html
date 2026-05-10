@@ -1,385 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Formulario de postulación — Sabores Express y Hamburguesas Extremas">
+  <title>Postulación — Sabores Express &amp; Hamburguesas Extremas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-<style>
-  <!--
-BLOQUE DE ESTILOS (CSS) DEL FORMULARIO DE SOLICITUD DE EMPLEO
+<!-- ════════════════════════════════════════════
+     APP SHELL
+     data-sheets-url: reemplazar con la URL del
+     Google Apps Script antes de producción.
+════════════════════════════════════════════ -->
+<div id="app" data-sheets-url="">
 
-Este bloque define toda la interfaz visual y experiencia de usuario del sistema de postulación laboral.
+  <!-- ── HEADER ── -->
+  <header class="app-header" role="banner">
+    <div class="header-logos" aria-label="Logos corporativos">
+      <img src="./assets/img/sabores-logo.jpg"
+           alt="Sabores Express"
+           class="logo logo--sabores"
+           width="48" height="48"
+           loading="eager">
+      <div class="logo-divider" aria-hidden="true"></div>
+      <img src="./assets/img/extremas-logo.jpg"
+           alt="Hamburguesas Extremas"
+           class="logo logo--ext"
+           width="42" height="42"
+           loading="eager">
+    </div>
+    <div class="header-text">
+      <h1 class="header-title">Solicitud de Empleo</h1>
+      <p class="header-sub">Sabores Express &amp; Hamburguesas Extremas</p>
+    </div>
+  </header>
 
-Funciones principales:
-- Configura tipografías, colores, márgenes, espaciados y estructura general del formulario.
-- Diseña un formulario multipaso tipo “wizard”, donde cada sección aparece progresivamente.
-- Implementa barra de progreso visual y estados de avance entre pasos.
-- Estiliza campos de formulario:
-  - Inputs
-  - Selects
-  - Opciones tipo radio personalizadas
-  - Checkboxes personalizados
-- Define estilos para validaciones, advertencias y mensajes de error.
-- Incluye componentes visuales para evaluaciones/cuestionarios de candidatos.
-- Configura botones de navegación entre pasos (siguiente, volver, continuar).
-- Agrega pantalla final de confirmación/agradecimiento luego de enviar la solicitud.
-- Incorpora animaciones, efectos hover y mejoras de UX/UI responsive.
-
-IMPORTANTE:
-Este bloque únicamente controla la capa visual (frontend/UI).
-No contiene lógica JavaScript ni conexión backend.
--->
-
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-#app{font-family:'Barlow',sans-serif;background:#F5F3EF;min-height:100vh}
-.hdr{background:#111;padding:12px 18px;display:flex;align-items:center;gap:12px}
-.hdr-logos{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.hdr-logos img{height:46px;width:46px;object-fit:contain;border-radius:50%;background:#1a1a1a}
-.hdr-logos .ext-img{border-radius:6px;height:40px;width:40px}
-.hdiv{width:1px;height:38px;background:#333;flex-shrink:0}
-.htxt{flex:1}
-.ht{color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;line-height:1.25}
-.hs{color:#aaa;font-size:11px;margin-top:1px}
-.pb-w{height:4px;background:#ddd}
-.pb-f{height:100%;background:#D41C1C;transition:width 0.4s}
-.slbl{display:flex;justify-content:space-between;padding:8px 18px 0;font-size:11px;color:#999;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
-.step{display:none;padding:18px 18px 28px;animation:fi .3s ease}
-.step.on{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.snum{display:inline-block;background:#D41C1C;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;padding:2px 8px;border-radius:4px;margin-bottom:6px;letter-spacing:.5px}
-.stitle{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:24px;color:#111;margin-bottom:2px}
-.ssub{font-size:12px;color:#777;margin-bottom:18px}
-.fld{margin-bottom:14px}
-.fld label{display:block;font-size:11px;font-weight:600;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
-.fld input,.fld select{width:100%;border:1.5px solid #ddd;border-radius:6px;padding:9px 11px;font-family:'Barlow',sans-serif;font-size:14px;background:#fff;color:#111;outline:none;transition:border-color .2s}
-.fld input:focus{border-color:#D41C1C}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.opts{display:grid;gap:7px}
-.ob{display:flex;align-items:center;gap:9px;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;cursor:pointer;background:#fff;font-size:13px;color:#333;transition:all .15s;user-select:none}
-.ob:hover{border-color:#D41C1C;background:#fff8f8}
-.ob.sel{border-color:#D41C1C;background:#fff0f0;color:#111}
-.dot{width:15px;height:15px;border-radius:50%;border:2px solid #ccc;flex-shrink:0;transition:all .15s}
-.ob.sel .dot{border-color:#D41C1C;background:#D41C1C}
-.olbl{font-weight:500}
-.cb{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1.5px solid #ddd;border-radius:8px;cursor:pointer;background:#fff;font-size:13px;color:#333;transition:all .15s;user-select:none}
-.cb:hover{border-color:#D41C1C}
-.cb.ck{border-color:#D41C1C;background:#fff0f0;color:#111}
-.cbox{width:15px;height:15px;border-radius:4px;border:2px solid #ccc;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px}
-.cb.ck .cbox{border-color:#D41C1C;background:#D41C1C;color:#fff}
-.prow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-.nr{display:flex;gap:8px;margin-top:20px}
-.btn-n{flex:1;background:#D41C1C;color:#fff;border:none;border-radius:8px;padding:13px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;cursor:pointer;transition:background .15s}
-.btn-n:hover{background:#A81515}
-.btn-b{background:#fff;color:#555;border:1.5px solid #ddd;border-radius:8px;padding:13px 16px;font-family:'Barlow',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .15s}
-.btn-b:hover{border-color:#aaa;color:#333}
-.cfg{background:#fff8e6;border:1.5px solid #f0c060;border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:#7a5a00;line-height:1.5}
-.cfg input{width:100%;border:1.5px solid #f0c060;border-radius:5px;padding:7px 9px;font-size:11px;font-family:'Barlow',sans-serif;background:#fff;color:#333;margin-top:5px;outline:none}
-.req-note{background:#fff3f3;border:1.5px solid #f9c0c0;border-radius:8px;padding:11px 13px;margin-top:8px;font-size:12px;color:#8a2020;line-height:1.5;display:none}
-.req-note.show{display:block}
-.sec-div{margin-top:18px;padding-top:16px;border-top:1.5px solid #e8e5e0}
-.sec-lbl{font-size:11px;font-weight:700;color:#D41C1C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.qwrap{background:#1a1d2e;border-radius:12px;padding:18px}
-.qcnt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:#aaa;letter-spacing:.5px;margin-bottom:10px}
-.qbar{height:3px;background:#2d3147;border-radius:2px;margin-bottom:16px}
-.qbar-f{height:100%;background:#D41C1C;border-radius:2px;transition:width .5s}
-.qtext{color:#fff;font-size:16px;font-weight:600;line-height:1.45;margin-bottom:18px;min-height:60px}
-.agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ans{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#fff;transition:all .15s;border:2px solid transparent;user-select:none}
-.ans:hover{filter:brightness(1.1)}
-.ans.a1{background:#e74c3c}.ans.a2{background:#2980b9}.ans.a3{background:#e67e22}.ans.a4{background:#27ae60}
-.ans .sh{font-size:18px;flex-shrink:0}
-.ans.picked{border-color:#fff}
-.ans.dis{cursor:default}
-.btn-qn{width:100%;background:#D41C1C;color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;cursor:pointer;margin-top:12px;display:none}
-.btn-qn.show{display:block}
-.btn-qn:hover{background:#A81515}
-.ty{text-align:center;padding:24px 0}
-.ty-logos{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:16px}
-.ty-logos img{height:52px;width:52px;object-fit:contain;border-radius:50%;background:#1a1a1a}
-.ty-logos .ty-ext{border-radius:6px;height:46px;width:46px}
-.ty-ico{font-size:52px;margin-bottom:10px}
-.ty-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;color:#111;margin-bottom:8px}
-.ty-sub{font-size:13px;color:#666;line-height:1.6;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto}
-.btn-exit{background:#111;color:#fff;border:none;border-radius:8px;padding:14px 36px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;cursor:pointer;letter-spacing:.5px}
-.btn-exit:hover{background:#333}
-.sst{font-size:11px;color:#888;margin-top:10px;min-height:14px;text-align:center}
-.sst.ok{color:#1a8a3a;font-weight:600}
-.sst.err{color:#D41C1C}
-</style>
-
-<div id="app">
-  <div class="hdr">
-    <div class="hdr-logos">
-      <img id="logo-s" src="" alt="Sabores Express" title="Sabores Express" />
-      <img id="logo-e" class="ext-img" src="" alt="Hamburguesas Extremas" title="Hamburguesas Extremas" />
-    </div>
-    <div class="hdiv"></div>
-    <div class="htxt">
-      <div class="ht">Formulario de Solicitud de Empleo</div>
-      <div class="hs">Sabores Express &amp; Hamburguesas Extremas</div>
-    </div>
-  </div>
-  <div class="pb-w"><div class="pb-f" id="pb" style="width:20%"></div></div>
-  <div class="slbl"><span id="sc">Paso 1 de 5</span><span id="sn">Datos personales</span></div>
-
-  <div class="step on" id="s1">
-    <div class="snum">PASO 1 / 5</div>
-    <div class="stitle">Datos personales</div>
-    <div class="ssub">Completá tu información de contacto</div>
-    <div class="cfg"><strong>Configuración:</strong> Pegá tu URL de Google Apps Script para recibir los datos en tu planilla.<br><input id="sh-url" placeholder="https://script.google.com/macros/s/XXXX/exec"/></div>
-    <div class="frow">
-      <div class="fld"><label>Nombre</label><input type="text" id="fn" placeholder="Tu nombre"/></div>
-      <div class="fld"><label>Apellido</label><input type="text" id="fa" placeholder="Tu apellido"/></div>
-    </div>
-    <div class="frow">
-      <div class="fld"><label>Edad</label><input type="number" id="fe" placeholder="Ej: 22" min="18" max="30"/></div>
-      <div class="fld"><label>Teléfono</label><input type="tel" id="ft" placeholder="11 xxxx-xxxx"/></div>
-    </div>
-    <div class="fld"><label>Email</label><input type="email" id="fem" placeholder="tucorreo@mail.com"/></div>
-    <div class="fld"><label>Barrio / Zona</label><input type="text" id="fz" placeholder="Ej: Palermo, San Martín..."/></div>
-    <div class="fld"><label>Puesto de interés</label>
-      <div class="prow" id="pg">
-        <div class="cb" data-val="Encargado de Local" onclick="tck(this)"><div class="cbox">✓</div><span style="font-size:11px;font-weight:500">Encarg. Local</span></div>
-        <div class="cb" data-val="Encargado de Turno" onclick="tck(this)"><div class="cbox">✓</div><span style="font-size:11px;font-weight:500">Encarg. Turno</span></div>
-        <div class="cb" data-val="Empleado" onclick="tck(this)"><div class="cbox">✓</div><span style="font-size:11px;font-weight:500">Empleado</span></div>
-      </div>
-    </div>
-    <div class="sec-div"><div class="sec-lbl">Requisitos del puesto</div></div>
-    <div class="fld"><label>¿Tenés disponibilidad de 18:00 a 03:00 hs?</label>
-      <div class="opts" id="dn">
-        <div class="ob" data-val="Sí" onclick="so(this,'dn')"><div class="dot"></div><span class="olbl">Sí, tengo disponibilidad en ese horario</span></div>
-        <div class="ob" data-val="No" onclick="so(this,'dn')"><div class="dot"></div><span class="olbl">No, no puedo en ese horario</span></div>
-      </div>
-    </div>
-    <div class="fld">
-      <label>Curso de Manipulación de Alimentos <span style="color:#D41C1C;font-size:10px;font-weight:700">(EXCLUYENTE)</span></label>
-      <div class="ssub" style="margin-bottom:8px;font-style:italic">Declaro que cuento con el Curso de Manipulación de Alimentos vigente o que me encuentro actualmente cursándolo.</div>
-      <div class="opts" id="cm">
-        <div class="ob" data-val="Sí, vigente o cursando" onclick="so(this,'cm');chkEx()"><div class="dot"></div><span class="olbl">Sí, lo tengo vigente o estoy cursándolo actualmente</span></div>
-        <div class="ob" data-val="No" onclick="so(this,'cm');chkEx()"><div class="dot"></div><span class="olbl">No, no lo tengo ni lo estoy cursando</span></div>
-      </div>
-      <div class="req-note" id="exmsg">Para continuar con la postulación es necesario contar con el Curso de Manipulación de Alimentos vigente o estar cursándolo. Este es un requisito excluyente.</div>
-    </div>
-    <div class="fld">
-      <label>Certificado de Antecedentes Penales</label>
-      <div class="ssub" style="margin-bottom:8px;font-style:italic">¿Tiene vigente su certificado de antecedentes penales? Recuerde que debe contar con el mismo para poder realizar la entrevista.</div>
-      <div class="opts" id="ant">
-        <div class="ob" data-val="Sí, vigente" onclick="so(this,'ant')"><div class="dot"></div><span class="olbl">Sí, está vigente</span></div>
-        <div class="ob" data-val="No / En trámite" onclick="so(this,'ant')"><div class="dot"></div><span class="olbl">No lo tengo / Está en trámite</span></div>
-      </div>
-    </div>
-    <div class="nr"><button class="btn-n" onclick="gn(1)">Siguiente →</button></div>
+  <!-- ── PROGRESS ── -->
+  <div class="progress-wrap" aria-hidden="true">
+    <div class="progress-fill" id="progressFill"></div>
   </div>
 
-  <div class="step" id="s2">
-    <div class="snum">PASO 2 / 5</div>
-    <div class="stitle">Disponibilidad</div>
-    <div class="ssub">La disponibilidad es clave en gastronomía</div>
-    <div class="fld"><label>¿Cuál es tu disponibilidad horaria?</label>
-      <div class="opts" id="dh">
-        <div class="ob" data-val="Full Time" data-pts="30" onclick="so(this,'dh')"><div class="dot"></div><span class="olbl">Full Time (40+ hs/semana)</span></div>
-        <div class="ob" data-val="Part Time Tarde/Noche" data-pts="25" onclick="so(this,'dh')"><div class="dot"></div><span class="olbl">Part Time — tarde/noche</span></div>
-        <div class="ob" data-val="Part Time Mañana" data-pts="15" onclick="so(this,'dh')"><div class="dot"></div><span class="olbl">Part Time — mañana</span></div>
-        <div class="ob" data-val="Solo fines de semana" data-pts="10" onclick="so(this,'dh')"><div class="dot"></div><span class="olbl">Solo fines de semana</span></div>
-      </div>
-    </div>
-    <div class="fld"><label>¿Podés trabajar fines de semana?</label>
-      <div class="opts" id="df">
-        <div class="ob" data-val="Siempre" data-pts="20" onclick="so(this,'df')"><div class="dot"></div><span class="olbl">Sí, siempre</span></div>
-        <div class="ob" data-val="A veces" data-pts="10" onclick="so(this,'df')"><div class="dot"></div><span class="olbl">A veces</span></div>
-        <div class="ob" data-val="No" data-pts="0" onclick="so(this,'df')"><div class="dot"></div><span class="olbl">No puedo los fines de semana</span></div>
-      </div>
-    </div>
-    <div class="fld"><label>¿Disponibilidad en feriados?</label>
-      <div class="opts" id="dfer">
-        <div class="ob" data-val="Sí" data-pts="10" onclick="so(this,'dfer')"><div class="dot"></div><span class="olbl">Sí, sin problema</span></div>
-        <div class="ob" data-val="No" data-pts="0" onclick="so(this,'dfer')"><div class="dot"></div><span class="olbl">No, no puedo en feriados</span></div>
-      </div>
-    </div>
-    <div class="fld"><label>¿Podés incorporarte de forma inmediata?</label>
-      <div class="opts" id="di">
-        <div class="ob" data-val="Sí" data-pts="10" onclick="so(this,'di')"><div class="dot"></div><span class="olbl">Sí, puedo empezar ya</span></div>
-        <div class="ob" data-val="En 2 semanas" data-pts="5" onclick="so(this,'di')"><div class="dot"></div><span class="olbl">En 1–2 semanas</span></div>
-        <div class="ob" data-val="En 1 mes" data-pts="0" onclick="so(this,'di')"><div class="dot"></div><span class="olbl">En 1 mes o más</span></div>
-      </div>
-    </div>
-    <div class="nr"><button class="btn-b" onclick="gb(2)">←</button><button class="btn-n" onclick="gn(2)">Siguiente →</button></div>
+  <!-- ── STEP INDICATOR ── -->
+  <div class="step-indicator" id="stepIndicator" aria-live="polite" aria-atomic="true">
+    <span class="step-ind-cur" id="stepIndCur">Paso 1 de 4</span>
+    <span class="step-ind-name" id="stepIndName">Datos personales</span>
   </div>
 
-  <div class="step" id="s3">
-    <div class="snum">PASO 3 / 5</div>
-    <div class="stitle">Experiencia</div>
-    <div class="ssub">Contanos tu historia laboral</div>
-    <div class="fld"><label>¿Tenés experiencia en gastronomía o atención?</label>
-      <div class="opts" id="eg">
-        <div class="ob" data-val="Más de 2 años" data-pts="20" onclick="so(this,'eg')"><div class="dot"></div><span class="olbl">Sí, más de 2 años</span></div>
-        <div class="ob" data-val="1-2 años" data-pts="15" onclick="so(this,'eg')"><div class="dot"></div><span class="olbl">Entre 1 y 2 años</span></div>
-        <div class="ob" data-val="Menos de 1 año" data-pts="8" onclick="so(this,'eg')"><div class="dot"></div><span class="olbl">Algo, menos de un año</span></div>
-        <div class="ob" data-val="Sin experiencia" data-pts="0" onclick="so(this,'eg')"><div class="dot"></div><span class="olbl">No, es mi primera vez</span></div>
+  <!-- ════════════════════════════════════════════
+       FORM STEPS
+  ════════════════════════════════════════════ -->
+  <main class="form-main" id="formMain">
+
+    <!-- ──────────────────────────────────────
+         PASO 1 · Datos personales
+    ────────────────────────────────────── -->
+    <section class="form-step is-active" id="step-1" data-step="1"
+             aria-labelledby="title-1">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-1">Datos personales</h2>
+        <p class="step-sub">Completá tu información de contacto</p>
+      </header>
+
+      <!-- Admin: URL del Apps Script -->
+      <div class="config-panel" id="configPanel">
+        <label class="config-label" for="sheetsUrl">
+          <span aria-hidden="true">⚙</span> URL Google Apps Script
+        </label>
+        <input type="url" id="sheetsUrl" class="config-input"
+               placeholder="https://script.google.com/macros/s/XXXX/exec"
+               autocomplete="off" spellcheck="false">
       </div>
-    </div>
-    <div class="fld"><label>¿Tenés experiencia en caja o manejo de dinero?</label>
-      <div class="opts" id="ec">
-        <div class="ob" data-val="Sí" data-pts="5" onclick="so(this,'ec')"><div class="dot"></div><span class="olbl">Sí, tengo experiencia</span></div>
-        <div class="ob" data-val="No" data-pts="0" onclick="so(this,'ec')"><div class="dot"></div><span class="olbl">No, nunca manejé caja</span></div>
+
+      <!-- Nombre + Apellido -->
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="firstName">
+            Nombre <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="text" id="firstName" class="field-input"
+                 autocomplete="given-name" inputmode="text"
+                 placeholder="Tu nombre" data-required>
+        </div>
+        <div class="field">
+          <label class="field-label" for="lastName">
+            Apellido <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="text" id="lastName" class="field-input"
+                 autocomplete="family-name" inputmode="text"
+                 placeholder="Tu apellido" data-required>
+        </div>
       </div>
-    </div>
-    <div class="nr"><button class="btn-b" onclick="gb(3)">←</button><button class="btn-n" onclick="gn(3)">Siguiente →</button></div>
-  </div>
 
-  <div class="step" id="s4">
-    <div class="snum">PASO 4 / 5 — AUTOEVALUACIÓN</div>
-    <div class="stitle">Autoevaluación</div>
-    <div class="ssub">12 preguntas sobre tu estilo de trabajo. No hay respuestas correctas ni incorrectas — respondé con honestidad.</div>
-    <div class="qwrap">
-      <div class="qcnt" id="qcnt">Pregunta 1 / 12</div>
-      <div class="qbar"><div class="qbar-f" id="qbf" style="width:0%"></div></div>
-      <div class="qtext" id="qt"></div>
-      <div class="agrid">
-        <div class="ans a1" id="a1" onclick="ansQ(1)"><span class="sh">▲</span><span>Completamente<br>en desacuerdo</span></div>
-        <div class="ans a2" id="a2" onclick="ansQ(2)"><span class="sh">◆</span><span>En desacuerdo</span></div>
-        <div class="ans a3" id="a3" onclick="ansQ(3)"><span class="sh">●</span><span>De acuerdo</span></div>
-        <div class="ans a4" id="a4" onclick="ansQ(4)"><span class="sh">■</span><span>Completamente<br>de acuerdo</span></div>
+      <!-- Edad + Teléfono -->
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="age">
+            Edad <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="number" id="age" class="field-input"
+                 min="16" max="99" inputmode="numeric"
+                 placeholder="Ej: 24" data-required>
+          <span class="field-hint">Preferencia 18–30 años</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="phone">
+            Teléfono <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="tel" id="phone" class="field-input"
+                 autocomplete="tel" inputmode="tel"
+                 placeholder="11 xxxx-xxxx" data-required>
+        </div>
       </div>
-      <button class="btn-qn" id="bqn" onclick="nxtQ()">Siguiente →</button>
-    </div>
-    <div class="nr" style="margin-top:14px"><button class="btn-b" id="bb4" onclick="gb(4)">←</button></div>
-  </div>
 
-  <div class="step" id="s5">
-    <div class="ty">
-      <div class="ty-logos">
-        <img id="ty-s" src="" alt="Sabores Express" />
-        <img id="ty-e" class="ty-ext" src="" alt="Hamburguesas Extremas" />
+      <!-- Email -->
+      <div class="field">
+        <label class="field-label" for="email">
+          Email <span class="req" aria-label="requerido">*</span>
+        </label>
+        <input type="email" id="email" class="field-input"
+               autocomplete="email" inputmode="email"
+               placeholder="tucorreo@mail.com" data-required>
       </div>
-      <div class="ty-ico">🎉</div>
-      <div class="ty-title">¡Gracias por postularte!</div>
-      <div class="ty-sub">Recibimos tu solicitud correctamente. Nos pondremos en contacto con vos en caso de avanzar con el proceso de selección.</div>
-      <button class="btn-exit" onclick="exitF()">Salir</button>
-      <div class="sst" id="sst"></div>
-    </div>
-  </div>
-</div>
 
-<script>
-const LS='data:image/png;base64,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';
-const LE='data:image/png;base64,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';
+      <!-- Zona -->
+      <div class="field">
+        <label class="field-label" for="zone">
+          Barrio / Zona <span class="req" aria-label="requerido">*</span>
+        </label>
+        <input type="text" id="zone" class="field-input"
+               inputmode="text"
+               placeholder="Ej: Palermo, San Martín..." data-required>
+      </div>
 
-['logo-s','ty-s'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=LS;});
-['logo-e','ty-e'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=LE;});
+      <!-- Puestos -->
+      <div class="field">
+        <label class="field-label">
+          Puesto de interés <span class="req" aria-label="requerido">*</span>
+        </label>
+        <div class="check-group" id="puestoGroup" role="group"
+             aria-label="Seleccioná uno o más puestos">
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Empleado Polivalente">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Empleado Polivalente</span>
+          </label>
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Encargado de Turno">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Encargado de Turno</span>
+          </label>
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Gerente de Local">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Gerente de Local</span>
+          </label>
+        </div>
+      </div>
 
-const NMS=['Datos personales','Disponibilidad','Experiencia','Autoevaluación','Resultado'];
-let cur=1,qq=0,qpts=0;
-const qans=[];
-const QZ=[
-  {q:"Me resulta sencillo iniciar una conversación con personas que no conozco.",c:4},
-  {q:"Sigo rigurosamente los pasos establecidos en cada tarea para asegurar que el resultado sea perfecto.",c:3},
-  {q:"Creo que mi deber principal es cumplir con las normas del local, más allá de las expectativas particulares del cliente.",c:3},
-  {q:"Considero que es más importante defender el punto de vista correcto que evitar una discusión.",c:1},
-  {q:"Prefiero resolver las situaciones sobre la marcha, rápido, sin depender tanto de una planificación estricta.",c:2},
-  {q:"Me genera entusiasmo rotar por diferentes puestos y aprender funciones que desconozco.",c:3},
-  {q:"Me esfuerzo por comprender la situación del cliente y trato de que se retire satisfecho, incluso si es alguien difícil.",c:4},
-  {q:"Prefiero perfeccionarme en una sola tarea específica hasta lograr dominarla por completo.",c:2},
-  {q:"Tengo facilidad para mantener la calma cuando el ritmo de trabajo se vuelve muy intenso.",c:3},
-  {q:"Soy una persona sumamente organizada y cumplo siempre mis horarios.",c:4},
-  {q:"Prefiero trabajar en ambientes donde las tareas sean predecibles y no cambien de un momento a otro.",c:2},
-  {q:"A veces soy descuidado con los detalles y me cuesta seguir una tarea repetitiva por mucho tiempo.",c:1}
-];
-function qp(a,c){const d=Math.abs(a-c);return d===0?10:d===1?5:d===2?2:0;}
-function upd(){
-  document.getElementById('pb').style.width=(cur/5*100)+'%';
-  document.getElementById('sc').textContent='Paso '+cur+' de 5';
-  document.getElementById('sn').textContent=NMS[cur-1];
-}
-function so(el,gid){document.querySelectorAll('#'+gid+' .ob').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
-function tck(el){el.classList.toggle('ck');}
-function gs(gid){const e=document.querySelector('#'+gid+' .ob.sel');return e?{val:e.dataset.val,pts:parseInt(e.dataset.pts)||0}:null;}
-function gc(gid){return Array.from(document.querySelectorAll('#'+gid+' .cb.ck')).map(b=>b.dataset.val).join(', ');}
-function chkEx(){
-  const s=gs('cm');
-  document.getElementById('exmsg').className='req-note'+(s&&s.val==='No'?' show':'');
-}
-function gn(f){
-  if(f===1){
-    if(!document.getElementById('fn').value.trim()||!document.getElementById('fa').value.trim()||!document.getElementById('fe').value||!document.getElementById('ft').value.trim()){alert('Completá nombre, apellido, edad y teléfono.');return;}
-    if(!gs('dn')){alert('Indicá tu disponibilidad de 18:00 a 03:00 hs.');return;}
-    const cm=gs('cm');
-    if(!cm){alert('Respondé la pregunta sobre el Curso de Manipulación de Alimentos.');return;}
-    if(cm.val==='No'){alert('El Curso de Manipulación de Alimentos es un requisito excluyente. No es posible continuar sin cumplirlo.');return;}
-    if(!gs('ant')){alert('Respondé la pregunta sobre el certificado de antecedentes penales.');return;}
-  }
-  if(f===2){if(!gs('dh')||!gs('df')||!gs('dfer')||!gs('di')){alert('Respondé todas las preguntas de disponibilidad.');return;}}
-  if(f===3){if(!gs('eg')||!gs('ec')){alert('Respondé todas las preguntas de experiencia.');return;}}
-  if(f===4){autoSub();}
-  document.getElementById('s'+f).classList.remove('on');
-  cur=f+1;
-  document.getElementById('s'+cur).classList.add('on');
-  upd();
-  if(cur===4){qq=0;qpts=0;qans.length=0;showQ();}
-  window.scrollTo(0,0);
-}
-function gb(f){document.getElementById('s'+f).classList.remove('on');cur=f-1;document.getElementById('s'+cur).classList.add('on');upd();}
-function showQ(){
-  document.getElementById('qcnt').textContent='Pregunta '+(qq+1)+' / 12';
-  document.getElementById('qbf').style.width=(qq/12*100)+'%';
-  document.getElementById('qt').textContent=QZ[qq].q;
-  document.getElementById('bqn').className='btn-qn';
-  [1,2,3,4].forEach(i=>{const b=document.getElementById('a'+i);b.className='ans a'+i;b.onclick=()=>ansQ(i);});
-}
-function ansQ(v){
-  qpts+=qp(v,QZ[qq].c);
-  qans.push({q:qq+1,answer:v,correct:QZ[qq].c,pts:qp(v,QZ[qq].c)});
-  [1,2,3,4].forEach(i=>{const b=document.getElementById('a'+i);b.classList.add('dis');b.onclick=null;if(i===v)b.classList.add('picked');});
-  const btn=document.getElementById('bqn');
-  btn.className='btn-qn show';
-  btn.textContent=qq<11?'Siguiente →':'Finalizar →';
-}
-function nxtQ(){
-  qq++;
-  if(qq<12){showQ();}
-  else{
-    document.getElementById('qbf').style.width='100%';
-    document.getElementById('bb4').style.display='none';
-    gn(4);
-  }
-}
-function calcSc(){
-  const h=gs('dh'),f=gs('df'),fer=gs('dfer'),ini=gs('di');
-  const eg=gs('eg'),ec=gs('ec');
-  const dT=(h?h.pts:0)+(f?f.pts:0)+(fer?fer.pts:0)+(ini?ini.pts:0);
-  const eT=(eg?eg.pts:0)+(ec?ec.pts:0);
-  const tot=dT+eT+qpts;
-  let prof=tot>=162?'A - Prioritario':tot>=121?'B - Considerar':tot>=75?'C - Guardar':'D - No aplica';
-  return{dT,eT,tot,prof};
-}
-async function autoSub(){
-  const url=document.getElementById('sh-url').value.trim();
-  if(!url)return;
-  const sc=calcSc();
-  const payload={
-    timestamp:new Date().toLocaleString('es-AR'),
-    nombre:document.getElementById('fn').value+' '+document.getElementById('fa').value,
-    edad:document.getElementById('fe').value,
-    zona:document.getElementById('fz').value,
-    telefono:document.getElementById('ft').value,
-    email:document.getElementById('fem').value,
-    puesto:gc('pg')||'No especificado',
-    disp_noche:gs('dn')?gs('dn').val:'',
-    curso_mani:gs('cm')?gs('cm').val:'',
-    antecedentes:gs('ant')?gs('ant').val:'',
-    disp_horaria:gs('dh')?gs('dh').val:'',
-    disp_fds:gs('df')?gs('df').val:'',
-    disp_feriados:gs('dfer')?gs('dfer').val:'',
-    inicio:gs('di')?gs('di').val:'',
-    exp_gastro:gs('eg')?gs('eg').val:'',
-    exp_caja:gs('ec')?gs('ec').val:'',
-    pts_disp:sc.dT,pts_exp:sc.eT,pts_quiz:qpts,pts_total:sc.tot,perfil:sc.prof,
-    quiz:JSON.stringify(qans)
-  };
-  const st=document.getElementById('sst');
-  try{
-    await fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    st.textContent='Solicitud enviada correctamente.';st.className='sst ok';
-  }catch(e){
-    st.textContent='Error al enviar. Verificá la URL del script.';st.className='sst err';
-  }
-}
-function exitF(){document.getElementById('app').innerHTML='<div style="text-align:center;padding:40px 20px;font-family:Barlow,sans-serif"><div style="font-size:40px;margin-bottom:12px">👋</div><div style="font-size:22px;font-weight:600;color:#111;margin-bottom:8px">¡Hasta pronto!</div><div style="font-size:13px;color:#777">Podés cerrar esta ventana.</div></div>';}
-upd();
-</script>
+      <!-- Separador de requisitos -->
+      <div class="section-sep" role="separator">
+        <span class="section-sep-lbl">Requisitos del puesto</span>
+      </div>
+
+      <!-- Disponibilidad nocturna -->
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés disponibilidad de 18:00 a 03:00 hs?
+          <span class="req" aria-label="requerido">*</span>
+        </label>
+        <div class="opt-group" data-group="dispNoche" role="radiogroup"
+             aria-label="Disponibilidad nocturna">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, tengo disponibilidad en ese horario</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no puedo en ese horario</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Curso manipulación (EXCLUYENTE) -->
+      <div class="field">
+        <label class="field-label">
+          Curso de Manipulación de Alimentos
+          <span class="badge-excl" aria-label="requisito excluyente">EXCLUYENTE</span>
+        </label>
+        <p class="field-desc">
+          Declaro que cuento con el Curso de Manipulación de Alimentos vigente
+          o que me encuentro actualmente cursándolo.
+        </p>
+        <div class="opt-group" data-group="cursoMani" role="radiogroup"
+             aria-label="Curso de manipulación de alimentos">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, lo tengo vigente o estoy cursándolo actualmente</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no lo tengo ni lo estoy cursando</span>
+          </button>
+        </div>
+        <div class="excl-warn" id="exclWarn" hidden role="alert">
+          <span aria-hidden="true">⚠</span>
+          <span>Este es un requisito excluyente para continuar la postulación.</span>
+        </div>
+      </div>
+
+      <!-- Antecedentes -->
+      <div class="field">
+        <label class="field-label">
+          Certificado de Antecedentes Penales
+          <span class="req" aria-label="requerido">*</span>
+        </label>
+        <p class="field-desc">
+          ¿Tiene vigente su certificado de antecedentes penales? Recuerde que
+          debe contar con el mismo para poder realizar la entrevista.
+        </p>
+        <div class="opt-group" data-group="antecedentes" role="radiogroup"
+             aria-label="Certificado de antecedentes penales">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, está vigente</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no-tramite">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No lo tengo / Está en trámite</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-1 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 2 · Disponibilidad
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-2" data-step="2"
+             aria-labelledby="title-2">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-2">Disponibilidad</h2>
+        <p class="step-sub">La disponibilidad es clave en gastronomía</p>
+      </header>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Cuál es tu disponibilidad horaria?
+          <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispHoraria" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="full-time" data-pts="30">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Full Time — 40+ hs/semana</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="part-tarde" data-pts="25">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Part Time — tarde / noche</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="part-manana" data-pts="15">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Part Time — mañana</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="solo-fds" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Solo fines de semana</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Podés trabajar fines de semana? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispFds" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="always" data-pts="20">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, siempre</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="sometimes" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">A veces</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="never" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No puedo los fines de semana</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Disponibilidad en feriados? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispFeriados" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="yes" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, sin problema</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no puedo en feriados</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Podés incorporarte de forma inmediata? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispInicio" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="now" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, puedo empezar ya</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="2weeks" data-pts="5">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">En 1–2 semanas</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="1month" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">En 1 mes o más</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-2 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 3 · Experiencia
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-3" data-step="3"
+             aria-labelledby="title-3">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-3">Experiencia</h2>
+        <p class="step-sub">Contanos tu historia laboral</p>
+      </header>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés experiencia en gastronomía o atención? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="expGastro" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="+2" data-pts="20">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, más de 2 años</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="1-2" data-pts="15">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Entre 1 y 2 años</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="lt1" data-pts="8">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Algo, menos de un año</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="0" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, es mi primera vez</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés experiencia en caja o manejo de dinero? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="expCaja" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="yes" data-pts="5">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, tengo experiencia</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, nunca manejé caja</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-3 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 4 · Quiz / Autoevaluación
+         (gestionado íntegramente por app.js)
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-4" data-step="4"
+             aria-labelledby="title-4">
+
+      <header class="quiz-header">
+        <!-- Barra de progreso interna del quiz -->
+        <div class="quiz-progress-track" aria-hidden="true">
+          <div class="quiz-progress-fill" id="quizProgressFill"></div>
+        </div>
+        <div class="quiz-meta">
+          <span class="quiz-counter" id="quizCounter"
+                aria-live="polite" aria-atomic="true">Pregunta 1 de 12</span>
+          <span class="quiz-tag" aria-hidden="true">Autoevaluación</span>
+        </div>
+        <h2 class="quiz-title" id="title-4">
+          Respondé con honestidad — no hay respuestas incorrectas.
+        </h2>
+      </header>
+
+      <!-- Pregunta activa (inyectada por JS) -->
+      <div class="quiz-body">
+        <p class="quiz-question" id="quizQuestion" aria-live="polite"></p>
+        <div class="quiz-answers" id="quizAnswers" role="group"
+             aria-label="Opciones de respuesta"></div>
+      </div>
+
+      <!-- Botón siguiente del quiz -->
+      <div class="quiz-footer" id="quizFooter" hidden>
+        <button type="button" class="btn-quiz-next" id="btnQuizNext">
+          Siguiente →
+        </button>
+      </div>
+
+    </section><!-- /step-4 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 5 · Gracias (pantalla final)
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-5" data-step="5"
+             aria-labelledby="title-5">
+
+      <div class="thanks-wrap">
+        <div class="thanks-logos" aria-hidden="true">
+          <img src="./assets/img/sabores-logo.jpg"
+               alt="" class="logo logo--sabores" width="56" height="56" loading="lazy">
+          <img src="./assets/img/extremas-logo.jpg"
+               alt="" class="logo logo--ext" width="50" height="50" loading="lazy">
+        </div>
+        <div class="thanks-icon" aria-hidden="true">🎉</div>
+        <h2 class="thanks-title" id="title-5">¡Gracias por postularte!</h2>
+        <p class="thanks-msg">
+          Recibimos tu solicitud. Si tu perfil avanza en el proceso de selección,
+          nos pondremos en contacto contigo.
+        </p>
+        <button type="button" class="btn-exit" id="btnExit">
+          Cerrar
+        </button>
+      </div>
+
+    </section><!-- /step-5 -->
+
+  </main><!-- /form-main -->
+
+  <!-- ── NAV STICKY ── -->
+  <nav class="form-nav" id="formNav" aria-label="Navegación del formulario">
+    <button type="button" class="btn-back" id="btnBack" hidden
+            aria-label="Volver al paso anterior">
+      ← Volver
+    </button>
+    <button type="button" class="btn-next" id="btnNext"
+            aria-label="Continuar al siguiente paso">
+      Continuar
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<script src="app.js"></script>
+</body>
+</html>
