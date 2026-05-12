@@ -507,11 +507,6 @@ function calculateScore() {
    § 14. ENVÍO A SUPABASE
 ══════════════════════════════════════════════════ */
 
-/**
- * Construye el payload para insertar en Supabase.
- * Los nombres de campo coinciden exactamente con las columnas
- * de la tabla `postulaciones`.
- */
 function buildPayload(scores) {
   const s   = state.selections;
   const i   = state.inputs;
@@ -547,10 +542,6 @@ function buildPayload(scores) {
   };
 }
 
-/**
- * Envía el payload a Supabase via REST API.
- * Falla silenciosamente para no bloquear la pantalla de gracias.
- */
 async function sendToSupabase(payload) {
   const url = `${CONFIG.supabaseUrl}/rest/v1/${CONFIG.supabaseTable}`;
 
@@ -571,19 +562,14 @@ async function sendToSupabase(payload) {
   }
 }
 
-/**
- * Orquesta: verifica duplicado → calcula score →
- * envía a Supabase → muestra pantalla de gracias.
- */
 async function submitForm() {
   const email   = state.inputs.email || '';
   const scores  = calculateScore();
   const payload = buildPayload(scores);
 
-  // URL del Google Apps Script
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJf9GWAYwiWlr2oiErRyXu737A6lricj4XreNXZvVJZ5lWf8zON5hfIF8ckn0Ie2hD/exec';
+  // ── CAMBIO 1: URL actualizada ──────────────────────────────────
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnRmJsBwK-sMel8LFpgFrQDMQEUfRygbB3v949fyXQFV7d6qU01U1FqHLrlzKZK7iXTg/exec';
 
-  // Prevención silenciosa de reenvíos
   if (email && isEmailKnown(email)) {
     goToStep(5);
     clearState();
@@ -596,11 +582,12 @@ async function submitForm() {
       // → Supabase (todos los perfiles, base de datos completa)
       sendToSupabase(payload),
 
-      // → Apps Script (el filtro A/B/C está en el script)
+      // → Apps Script (9 columnas en Google Sheets)
+      // ── CAMBIO 2: Content-Type corregido a text/plain ──────────
       fetch(APPS_SCRIPT_URL, {
         method:  'POST',
         mode:    'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body:    JSON.stringify({
           ...payload,
           created_at: new Date().toLocaleString('es-AR')
@@ -609,7 +596,6 @@ async function submitForm() {
 
     ]);
   } catch (err) {
-    // Fallar silenciosamente — mostrar gracias de todas formas
     console.error('[Submit] error:', err);
   }
 
