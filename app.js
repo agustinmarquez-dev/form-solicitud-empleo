@@ -581,7 +581,7 @@ async function submitForm() {
   const payload = buildPayload(scores);
 
   // URL del Google Apps Script
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTl_MXrJWNOcoFLldiqUt0snwep9cvDvPpuGZspiTpV8tO24CrF6tz8nUbNzp4ask6BA/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJf9GWAYwiWlr2oiErRyXu737A6lricj4XreNXZvVJZ5lWf8zON5hfIF8ckn0Ie2hD/exec';
 
   // Prevención silenciosa de reenvíos
   if (email && isEmailKnown(email)) {
