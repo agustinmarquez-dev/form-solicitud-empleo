@@ -131,11 +131,20 @@
       <!-- Zona -->
       <div class="field">
         <label class="field-label" for="zone">
-          Barrio / Zona <span class="req" aria-label="requerido">*</span>
+          Zona <span class="req" aria-label="requerido">*</span>
         </label>
-        <input type="text" id="zone" class="field-input"
-               inputmode="text"
-               placeholder="Ej: Palermo, San Martín..." data-required>
+        <select id="zone" class="field-input" data-required>
+          <option value="" disabled selected>Seleccioná tu zona</option>
+          <option value="CABA">CABA</option>
+          <option value="Sur">Sur</option>
+          <option value="Norte">Norte</option>
+          <option value="Oeste">Oeste</option>
+          <option value="Zárate">Zárate</option>
+          <option value="Mar del Plata">Mar del Plata</option>
+          <option value="Luján">Luján</option>
+          <option value="Rosario">Rosario</option>
+          <option value="La Plata">La Plata</option>
+        </select>
       </div>
 
       <!-- Puestos -->
