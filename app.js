@@ -5,37 +5,7 @@
  * Sabores Express & Hamburguesas Extremas
  *
  * Arquitectura: Vanilla JS puro | Sin dependencias
- * ─────────────────────────────────────────────────────────────────
- *
- * CONFIGURACIÓN ANTES DE PRODUCCIÓN:
- *   1. En index.html → <div id="app" data-sheets-url="TU_URL_AQUI">
- *   2. O bien editar CONFIG.sheetsUrl directamente aquí abajo.
- *
- * APPS SCRIPT (doPost) — pegar en Google Apps Script:
- * ─────────────────────────────────────────────────────────────────
- *   function doPost(e) {
- *     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
- *     if (sheet.getLastRow() === 0) {
- *       sheet.appendRow([
- *         'Timestamp','Nombre','Edad','Zona','Teléfono','Email','Puesto',
- *         'Disp.Noche','Curso.Mani','Antecedentes',
- *         'Disp.Horaria','Disp.FDS','Disp.Feriados','Inicio',
- *         'Exp.Gastro','Exp.Caja',
- *         'Pts.Disp','Pts.Exp','Pts.Quiz','Pts.Total','Perfil',
- *         'Quiz.Detalle'
- *       ]);
- *     }
- *     var d = JSON.parse(e.postData.contents);
- *     sheet.appendRow([
- *       d.timestamp, d.nombre, d.edad, d.zona, d.telefono, d.email, d.puesto,
- *       d.disp_noche, d.curso_mani, d.antecedentes,
- *       d.disp_horaria, d.disp_fds, d.disp_feriados, d.inicio,
- *       d.exp_gastro, d.exp_caja,
- *       d.pts_disp, d.pts_exp, d.pts_quiz, d.pts_total, d.perfil,
- *       d.quiz_detalle
- *     ]);
- *     return ContentService.createTextOutput('OK');
- *   }
+ * Base de datos: Supabase (REST API)
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -46,8 +16,10 @@
 ══════════════════════════════════════════════════ */
 
 const CONFIG = {
-  /** URL del Google Apps Script (reemplazar en producción) */
-  sheetsUrl: '',
+  /** Supabase */
+  supabaseUrl:    'https://syogghrwhkwdrtlcxlqp.supabase.co',
+  supabaseKey:    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b2dnaHJ3aGt3ZHJ0bGN4bHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTI2NzUsImV4cCI6MjA5NDE4ODY3NX0.Xcd5Fh3G8oo08WCaf9WcaMaFMCtf_tJIHHSDq0o0_vE',
+  supabaseTable:  'postulaciones',
 
   /** Claves de localStorage */
   storageKey: 'ats_gastro_v2',
@@ -68,10 +40,6 @@ const CONFIG = {
    § 2. SCORING
 ══════════════════════════════════════════════════ */
 
-/**
- * Mapa de valores → puntos por grupo.
- * CRÍTICO: no modificar sin actualizar los umbrales de perfil.
- */
 const SCORE_MAP = {
   dispHoraria:  { 'full-time': 30, 'part-tarde': 25, 'part-manana': 15, 'solo-fds': 10 },
   dispFds:      { 'always': 20, 'sometimes': 10, 'never': 0 },
@@ -81,10 +49,7 @@ const SCORE_MAP = {
   expCaja:      { 'yes': 5, 'no': 0 }
 };
 
-/**
- * Puntos del quiz por distancia a la respuesta ideal.
- * distancia 0 → 10 pts | 1 → 5 | 2 → 2 | 3 → 0
- */
+/** Puntos del quiz por distancia a la respuesta ideal */
 const QUIZ_PTS = [10, 5, 2, 0];
 
 /**
@@ -100,7 +65,7 @@ const PROFILES = [
 
 
 /* ══════════════════════════════════════════════════
-   § 3. PREGUNTAS DEL QUIZ (orden e valores exactos)
+   § 3. PREGUNTAS DEL QUIZ
 ══════════════════════════════════════════════════ */
 
 const QUIZ = [
@@ -118,7 +83,6 @@ const QUIZ = [
   { q: 'A veces soy descuidado con los detalles y me cuesta seguir una tarea repetitiva por mucho tiempo.',            correct: 1 }
 ];
 
-/** Opciones de respuesta con icono, etiqueta y clase CSS */
 const QUIZ_OPTIONS = [
   { value: 1, label: 'Completamente\nen desacuerdo', shape: '▲', mod: '--1' },
   { value: 2, label: 'En desacuerdo',                shape: '◆', mod: '--2' },
@@ -132,19 +96,19 @@ const QUIZ_OPTIONS = [
 ══════════════════════════════════════════════════ */
 
 const state = {
-  step:        1,          // paso actual (1–5)
-  inputs:      {},         // { fieldId: value }
-  selections:  {},         // { groupName: { value, pts } }
-  puestos:     [],         // posiciones seleccionadas
-  quizIndex:   0,          // pregunta actual del quiz (0–11)
-  quizAnswers: [],         // [{ q, answer, correct, pts }]
-  quizScore:   0,          // suma de pts del quiz
-  sheetsUrl:   ''          // URL configurada por admin
+  step:        1,
+  inputs:      {},
+  selections:  {},
+  puestos:     [],
+  quizIndex:   0,
+  quizAnswers: [],
+  quizScore:   0,
+  sheetsUrl:   ''
 };
 
 
 /* ══════════════════════════════════════════════════
-   § 5. ACCESOS AL DOM (lazy, centralizados)
+   § 5. ACCESOS AL DOM
 ══════════════════════════════════════════════════ */
 
 const el = (id) => document.getElementById(id);
@@ -180,7 +144,7 @@ function saveState() {
       ...state,
       savedAt: Date.now()
     }));
-  } catch (_) { /* cuota llena — ignorar silenciosamente */ }
+  } catch (_) {}
 }
 
 function loadState() {
@@ -194,7 +158,6 @@ function loadState() {
       return false;
     }
 
-    // Combinar sin sobrescribir propiedades no almacenadas
     Object.assign(state, saved);
     return true;
   } catch (_) {
@@ -233,23 +196,16 @@ function registerEmail(email) {
    § 8. NAVEGACIÓN ENTRE PASOS
 ══════════════════════════════════════════════════ */
 
-/**
- * Transiciona al paso indicado, actualizando UI y estado.
- * @param {number} targetStep
- */
 function goToStep(targetStep) {
-  // Ocultar paso actual
   const prevEl = el('step-' + state.step);
   if (prevEl) prevEl.classList.remove('is-active');
 
-  // Mostrar paso destino
   const nextEl = el('step-' + targetStep);
   if (!nextEl) return;
   nextEl.classList.add('is-active');
 
   state.step = targetStep;
 
-  // Scroll al inicio
   const main = DOM.formMain();
   if (main) main.scrollTop = 0;
 
@@ -265,7 +221,6 @@ function handleNext() {
     goToStep(state.step + 1);
     if (state.step === 4) startQuiz();
   }
-  // El paso 4 (quiz) tiene su propia navegación interna
 }
 
 function handleBack() {
@@ -289,7 +244,6 @@ function validateCurrentStep() {
 }
 
 function validateStep1() {
-  // Campos de texto obligatorios
   const textFields = ['firstName', 'lastName', 'age', 'phone', 'email', 'zone'];
 
   for (const id of textFields) {
@@ -303,7 +257,6 @@ function validateStep1() {
     }
   }
 
-  // Validación básica de email
   const emailEl = el('email');
   if (emailEl && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
     emailEl.classList.add('is-error');
@@ -312,13 +265,11 @@ function validateStep1() {
     return false;
   }
 
-  // Al menos un puesto seleccionado
   if (state.puestos.length === 0) {
     showStepError(1, 'Seleccioná al menos un puesto de interés.');
     return false;
   }
 
-  // Grupos requeridos del paso 1
   const reqGroups = ['dispNoche', 'cursoMani', 'antecedentes'];
   for (const g of reqGroups) {
     if (!state.selections[g]) {
@@ -327,7 +278,6 @@ function validateStep1() {
     }
   }
 
-  // Bloqueo por requisito excluyente
   if (state.selections.cursoMani?.value === 'no') {
     showStepError(1, 'El Curso de Manipulación de Alimentos es un requisito excluyente.');
     return false;
@@ -336,11 +286,6 @@ function validateStep1() {
   return true;
 }
 
-/**
- * Valida que todos los grupos indicados tengan selección.
- * @param {string[]} groups - nombres de data-group
- * @param {number}   step   - paso en el que mostrar el error
- */
 function validateOptGroups(groups, step) {
   for (const g of groups) {
     if (!state.selections[g]) {
@@ -351,10 +296,6 @@ function validateOptGroups(groups, step) {
   return true;
 }
 
-/**
- * Muestra un mensaje de error no invasivo dentro del paso.
- * Se auto-oculta a los 3.5 s.
- */
 function showStepError(step, msg) {
   const stepEl = el('step-' + step);
   if (!stepEl) return;
@@ -363,7 +304,6 @@ function showStepError(step, msg) {
   if (!errEl) {
     errEl = document.createElement('p');
     errEl.className = 'step-error';
-    // Insertarlo justo después del encabezado del paso
     const header = stepEl.querySelector('.step-header');
     header
       ? header.insertAdjacentElement('afterend', errEl)
@@ -402,11 +342,9 @@ function updateNavUI() {
   const back     = DOM.btnBack();
   const next     = DOM.btnNext();
 
-  // En la pantalla de gracias no hay nav
   if (step === 5) { if (nav) nav.hidden = true; return; }
   if (nav) nav.hidden = false;
 
-  // En el quiz: solo hay nav interna (sin botones del shell)
   const isQuiz = step === 4;
   if (back) back.hidden = (step === 1 || isQuiz);
   if (next) next.hidden = isQuiz;
@@ -425,14 +363,11 @@ function handleOptionClick(btn) {
   const value     = btn.dataset.value;
   const pts       = parseInt(btn.dataset.pts || '0', 10);
 
-  // Actualizar visual
   group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('is-sel'));
   btn.classList.add('is-sel');
 
-  // Actualizar estado
   state.selections[groupName] = { value, pts };
 
-  // Advertencia de requisito excluyente
   if (groupName === 'cursoMani') {
     const warn = DOM.exclWarn();
     if (warn) warn.hidden = (value !== 'no');
@@ -447,7 +382,6 @@ function handleOptionClick(btn) {
 ══════════════════════════════════════════════════ */
 
 function startQuiz() {
-  // Solo reiniciar si no hay progreso guardado
   if (state.quizAnswers.length === 0) {
     state.quizIndex  = 0;
     state.quizScore  = 0;
@@ -455,29 +389,23 @@ function startQuiz() {
   renderQuizQuestion();
 }
 
-/**
- * Renderiza la pregunta actual con animación de entrada.
- */
 function renderQuizQuestion() {
   const idx = state.quizIndex;
   const q   = QUIZ[idx];
   if (!q) return;
 
-  // Contador y barra de progreso
   const counter = DOM.quizCounter();
   if (counter) counter.textContent = `Pregunta ${idx + 1} de ${QUIZ.length}`;
 
   const pbar = DOM.quizProgressFill();
   if (pbar) pbar.style.width = `${(idx / QUIZ.length) * 100}%`;
 
-  // Animar texto de pregunta (fade + slide leve)
   const qEl = DOM.quizQuestion();
   if (qEl) {
     qEl.style.opacity   = '0';
     qEl.style.transform = 'translateY(10px)';
     qEl.textContent     = q.q;
 
-    // Doble rAF para garantizar repaint antes de la transición
     requestAnimationFrame(() => requestAnimationFrame(() => {
       qEl.style.transition = 'opacity 0.24s ease, transform 0.24s ease';
       qEl.style.opacity    = '1';
@@ -485,7 +413,6 @@ function renderQuizQuestion() {
     }));
   }
 
-  // Renderizar botones de respuesta
   const answersEl = DOM.quizAnswers();
   if (answersEl) {
     answersEl.innerHTML = '';
@@ -506,25 +433,19 @@ function renderQuizQuestion() {
     });
   }
 
-  // Ocultar botón siguiente hasta que respondan
   const footer = DOM.quizFooter();
   if (footer) footer.hidden = true;
 
-  // Texto del botón: último paso muestra "Finalizar"
   const nextBtn = DOM.btnQuizNext();
   if (nextBtn) nextBtn.textContent = idx < QUIZ.length - 1 ? 'Siguiente →' : 'Finalizar →';
 }
 
-/**
- * Procesa la respuesta seleccionada (sin revelar si es correcta).
- */
 function handleQuizAnswer(btn, value) {
   const idx  = state.quizIndex;
   const corr = QUIZ[idx].correct;
   const dist = Math.abs(value - corr);
   const pts  = QUIZ_PTS[Math.min(dist, 3)];
 
-  // Deshabilitar todos los botones y resaltar el elegido
   const answersEl = DOM.quizAnswers();
   if (answersEl) {
     answersEl.querySelectorAll('.quiz-ans').forEach(b => {
@@ -532,30 +453,24 @@ function handleQuizAnswer(btn, value) {
       b.disabled = true;
     });
     btn.classList.add('is-picked');
-    btn.classList.remove('is-off'); // la respuesta elegida mantiene opacidad
+    btn.classList.remove('is-off');
   }
 
-  // Registrar respuesta
   state.quizAnswers.push({ q: idx + 1, answer: value, correct: corr, pts });
   state.quizScore += pts;
 
-  // Mostrar botón siguiente
   const footer = DOM.quizFooter();
   if (footer) footer.hidden = false;
 
   saveState();
 }
 
-/**
- * Avanza a la siguiente pregunta o termina el quiz.
- */
 function handleQuizNext() {
   state.quizIndex++;
 
   if (state.quizIndex < QUIZ.length) {
     renderQuizQuestion();
   } else {
-    // Quiz completado → barra al 100% y enviar
     const pbar = DOM.quizProgressFill();
     if (pbar) pbar.style.width = '100%';
     submitForm();
@@ -567,10 +482,6 @@ function handleQuizNext() {
    § 13. CÁLCULO DE PUNTUACIÓN
 ══════════════════════════════════════════════════ */
 
-/**
- * Calcula el score total y devuelve el perfil correspondiente.
- * @returns {{ dispScore, expScore, quizScore, total, profile }}
- */
 function calculateScore() {
   const sel   = state.selections;
   const getP  = (map, key) => (sel[key] ? (map[sel[key].value] ?? 0) : 0);
@@ -593,11 +504,13 @@ function calculateScore() {
 
 
 /* ══════════════════════════════════════════════════
-   § 14. ENVÍO A GOOGLE SHEETS
+   § 14. ENVÍO A SUPABASE
 ══════════════════════════════════════════════════ */
 
 /**
- * Construye el payload completo para Google Sheets.
+ * Construye el payload para insertar en Supabase.
+ * Los nombres de campo coinciden exactamente con las columnas
+ * de la tabla `postulaciones`.
  */
 function buildPayload(scores) {
   const s   = state.selections;
@@ -605,44 +518,70 @@ function buildPayload(scores) {
   const val = (g) => s[g]?.value ?? '';
 
   return {
-    timestamp:    new Date().toLocaleString('es-AR'),
-    nombre:       `${i.firstName || ''} ${i.lastName || ''}`.trim(),
-    edad:         i.age      || '',
-    zona:         i.zone     || '',
-    telefono:     i.phone    || '',
-    email:        i.email    || '',
-    puesto:       state.puestos.join(', ') || 'No especificado',
+    nombre:        `${i.firstName || ''} ${i.lastName || ''}`.trim(),
+    edad:          i.age      ? parseInt(i.age, 10) : null,
+    email:         i.email    || '',
+    telefono:      i.phone    || '',
+    zona:          i.zone     || '',
+    puesto:        state.puestos.join(', ') || 'No especificado',
 
-    disp_noche:   val('dispNoche'),
-    curso_mani:   val('cursoMani'),
-    antecedentes: val('antecedentes'),
+    disp_noche:    val('dispNoche'),
+    curso_mani:    val('cursoMani'),
+    antecedentes:  val('antecedentes'),
 
-    disp_horaria: val('dispHoraria'),
-    disp_fds:     val('dispFds'),
-    disp_feriados:val('dispFeriados'),
-    inicio:       val('dispInicio'),
+    disp_horaria:  val('dispHoraria'),
+    disp_fds:      val('dispFds'),
+    disp_feriados: val('dispFeriados'),
+    inicio:        val('dispInicio'),
 
-    exp_gastro:   val('expGastro'),
-    exp_caja:     val('expCaja'),
+    exp_gastro:    val('expGastro'),
+    exp_caja:      val('expCaja'),
 
-    pts_disp:     scores.dispScore,
-    pts_exp:      scores.expScore,
-    pts_quiz:     scores.quizScore,
-    pts_total:    scores.total,
-    perfil:       `${scores.profile.code} - ${scores.profile.label}`,
+    pts_disp:      scores.dispScore,
+    pts_exp:       scores.expScore,
+    pts_quiz:      scores.quizScore,
+    pts_total:     scores.total,
+    perfil:        `${scores.profile.code} - ${scores.profile.label}`,
 
-    quiz_detalle: JSON.stringify(state.quizAnswers)
+    quiz_detalle:  JSON.stringify(state.quizAnswers)
   };
 }
 
 /**
- * Envía el formulario: verifica duplicado, calcula score,
- * postea a Sheets y muestra pantalla de gracias.
+ * Envía el payload a Supabase via REST API.
+ * Falla silenciosamente para no bloquear la pantalla de gracias.
+ */
+async function sendToSupabase(payload) {
+  const url = `${CONFIG.supabaseUrl}/rest/v1/${CONFIG.supabaseTable}`;
+
+  const response = await fetch(url, {
+    method:  'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'apikey':         CONFIG.supabaseKey,
+      'Authorization': `Bearer ${CONFIG.supabaseKey}`,
+      'Prefer':        'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.error('[Supabase] Error al insertar:', err);
+  }
+}
+
+/**
+ * Orquesta: verifica duplicado → calcula score →
+ * envía a Supabase → muestra pantalla de gracias.
  */
 async function submitForm() {
   const email   = state.inputs.email || '';
   const scores  = calculateScore();
   const payload = buildPayload(scores);
+
+  // URL del Google Apps Script
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTl_MXrJWNOcoFLldiqUt0snwep9cvDvPpuGZspiTpV8tO24CrF6tz8nUbNzp4ask6BA/exec';
 
   // Prevención silenciosa de reenvíos
   if (email && isEmailKnown(email)) {
@@ -651,30 +590,31 @@ async function submitForm() {
     return;
   }
 
-  // Determinar URL (estado > atributo HTML > constante)
-  const appEl  = DOM.app();
-  const url    = state.sheetsUrl
-              || (appEl?.dataset.sheetsUrl || '')
-              || CONFIG.sheetsUrl;
+  try {
+    await Promise.all([
 
-  if (url) {
-    try {
-      await fetch(url, {
+      // → Supabase (todos los perfiles, base de datos completa)
+      sendToSupabase(payload),
+
+      // → Apps Script (el filtro A/B/C está en el script)
+      fetch(APPS_SCRIPT_URL, {
         method:  'POST',
-        mode:    'no-cors',          // Apps Script no devuelve CORS
+        mode:    'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-      });
-    } catch (_) {
-      // Fallar silenciosamente — mostrar gracias de todas formas
-    }
+        body:    JSON.stringify({
+          ...payload,
+          created_at: new Date().toLocaleString('es-AR')
+        })
+      })
+
+    ]);
+  } catch (err) {
+    // Fallar silenciosamente — mostrar gracias de todas formas
+    console.error('[Submit] error:', err);
   }
 
-  // Registrar email y limpiar borrador
   if (email) registerEmail(email);
   clearState();
-
-  // Mostrar pantalla final
   goToStep(5);
 }
 
@@ -683,11 +623,7 @@ async function submitForm() {
    § 15. RESTAURACIÓN DESDE LOCALSTORAGE
 ══════════════════════════════════════════════════ */
 
-/**
- * Aplica el estado guardado al DOM (inputs, selecciones, checkboxes).
- */
 function restoreDOMFromState() {
-  // Inputs de texto
   ['firstName', 'lastName', 'age', 'phone', 'email', 'zone'].forEach(id => {
     const input = el(id);
     if (input && state.inputs[id] !== undefined) {
@@ -695,11 +631,9 @@ function restoreDOMFromState() {
     }
   });
 
-  // URL del Apps Script
   const sheetsEl = DOM.sheetsInput();
   if (sheetsEl && state.sheetsUrl) sheetsEl.value = state.sheetsUrl;
 
-  // Grupos de opciones
   Object.entries(state.selections).forEach(([groupName, sel]) => {
     if (!sel) return;
     const group = document.querySelector(`[data-group="${groupName}"]`);
@@ -708,7 +642,6 @@ function restoreDOMFromState() {
     const btn = group.querySelector(`[data-value="${sel.value}"]`);
     if (btn) {
       btn.classList.add('is-sel');
-      // Advertencia excluyente
       if (groupName === 'cursoMani' && sel.value === 'no') {
         const warn = DOM.exclWarn();
         if (warn) warn.hidden = false;
@@ -716,7 +649,6 @@ function restoreDOMFromState() {
     }
   });
 
-  // Checkboxes de puestos
   state.puestos.forEach(val => {
     const input = document.querySelector(`input[name="puesto"][value="${val}"]`);
     if (input) {
@@ -733,15 +665,12 @@ function restoreDOMFromState() {
 
 function registerEvents() {
 
-  // ── Botones de navegación principal ──
   DOM.btnNext()?.addEventListener('click', handleNext);
   DOM.btnBack()?.addEventListener('click', handleBack);
   DOM.btnQuizNext()?.addEventListener('click', handleQuizNext);
 
-  // ── Botón de salida en pantalla de gracias ──
   DOM.btnExit()?.addEventListener('click', () => {
     window.close();
-    // Fallback si el navegador no permite cerrar
     setTimeout(() => {
       DOM.app().innerHTML = `
         <div style="
@@ -759,7 +688,6 @@ function registerEvents() {
     }, 200);
   });
 
-  // ── Grupos de opciones (radio-style) — delegación de eventos ──
   document.querySelectorAll('.opt-group').forEach(group => {
     group.addEventListener('click', e => {
       const btn = e.target.closest('.opt-btn');
@@ -767,10 +695,8 @@ function registerEvents() {
     });
   });
 
-  // ── Checkboxes de puestos ──
   document.querySelectorAll('input[name="puesto"]').forEach(input => {
     input.addEventListener('change', () => {
-      // Clase para compatibilidad con browsers sin :has()
       input.closest('.check-opt')?.classList.toggle('is-checked', input.checked);
       state.puestos = Array.from(
         document.querySelectorAll('input[name="puesto"]:checked')
@@ -779,7 +705,6 @@ function registerEvents() {
     });
   });
 
-  // ── Inputs de texto: guardar y limpiar error visual ──
   ['firstName', 'lastName', 'age', 'phone', 'email', 'zone'].forEach(id => {
     const input = el(id);
     if (!input) return;
@@ -790,14 +715,12 @@ function registerEvents() {
       saveState();
     });
 
-    // blur como respaldo para asegurar guardado
     input.addEventListener('blur', () => {
       state.inputs[id] = input.value;
       saveState();
     });
   });
 
-  // ── URL del Apps Script ──
   DOM.sheetsInput()?.addEventListener('input', e => {
     state.sheetsUrl = e.target.value.trim();
     saveState();
@@ -813,20 +736,16 @@ function init() {
   const hasSaved = loadState();
 
   if (hasSaved && state.step > 1 && state.step <= 5) {
-    // Restaurar paso guardado
     el('step-1')?.classList.remove('is-active');
     el('step-' + state.step)?.classList.add('is-active');
     restoreDOMFromState();
 
-    // Si se guardó a mitad del quiz, retomarlo
     if (state.step === 4) renderQuizQuestion();
   } else {
-    // Inicio fresco
     state.step = 1;
     el('step-1')?.classList.add('is-active');
   }
 
-  // Prioridad para la URL: atributo HTML > constante
   if (!state.sheetsUrl) {
     const fromAttr = DOM.app()?.dataset.sheetsUrl || '';
     if (fromAttr) {
@@ -841,5 +760,4 @@ function init() {
   registerEvents();
 }
 
-// Punto de entrada
 document.addEventListener('DOMContentLoaded', init);
