@@ -5,7 +5,7 @@
  * Sabores Express & Hamburguesas Extremas
  *
  * Arquitectura: Vanilla JS puro | Sin dependencias
- * Base de datos: Supabase (REST API)
+ * Envío: n8n Webhook → Google Sheets
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -16,10 +16,8 @@
 ══════════════════════════════════════════════════ */
 
 const CONFIG = {
-  /** Supabase */
-  supabaseUrl:    'https://syogghrwhkwdrtlcxlqp.supabase.co',
-  supabaseKey:    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5b2dnaHJ3aGt3ZHJ0bGN4bHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTI2NzUsImV4cCI6MjA5NDE4ODY3NX0.Xcd5Fh3G8oo08WCaf9WcaMaFMCtf_tJIHHSDq0o0_vE',
-  supabaseTable:  'postulaciones',
+  /** n8n Webhook */
+  n8nWebhookUrl: 'https://kevin9705.app.n8n.cloud/webhook/98785e25-1eeb-4732-9881-9cb61694890b',
 
   /** Claves de localStorage */
   storageKey: 'ats_gastro_v2',
@@ -504,7 +502,7 @@ function calculateScore() {
 
 
 /* ══════════════════════════════════════════════════
-   § 14. ENVÍO A SUPABASE
+   § 14. ENVÍO — n8n Webhook
 ══════════════════════════════════════════════════ */
 
 function buildPayload(scores) {
@@ -542,33 +540,22 @@ function buildPayload(scores) {
   };
 }
 
-async function sendToSupabase(payload) {
-  const url = `${CONFIG.supabaseUrl}/rest/v1/${CONFIG.supabaseTable}`;
-
-  const response = await fetch(url, {
+// ── n8n: envía todos los campos + timestamp legible ──────────────
+async function sendToN8n(payload) {
+  await fetch(CONFIG.n8nWebhookUrl, {
     method:  'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'apikey':         CONFIG.supabaseKey,
-      'Authorization': `Bearer ${CONFIG.supabaseKey}`,
-      'Prefer':        'return=minimal'
-    },
-    body: JSON.stringify(payload)
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({
+      ...payload,
+      created_at: new Date().toLocaleString('es-AR')
+    })
   });
-
-  if (!response.ok) {
-    const err = await response.text();
-    console.error('[Supabase] Error al insertar:', err);
-  }
 }
 
 async function submitForm() {
   const email   = state.inputs.email || '';
   const scores  = calculateScore();
   const payload = buildPayload(scores);
-
-  // ── CAMBIO 1: URL actualizada ──────────────────────────────────
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxnRmJsBwK-sMel8LFpgFrQDMQEUfRygbB3v949fyXQFV7d6qU01U1FqHLrlzKZK7iXTg/exec';
 
   if (email && isEmailKnown(email)) {
     goToStep(5);
@@ -577,24 +564,8 @@ async function submitForm() {
   }
 
   try {
-    await Promise.all([
-
-      // → Supabase (todos los perfiles, base de datos completa)
-      sendToSupabase(payload),
-
-      // → Apps Script (9 columnas en Google Sheets)
-      // ── CAMBIO 2: Content-Type corregido a text/plain ──────────
-      fetch(APPS_SCRIPT_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body:    JSON.stringify({
-          ...payload,
-          created_at: new Date().toLocaleString('es-AR')
-        })
-      })
-
-    ]);
+    // → n8n Webhook (filtra y envía a Google Sheets)
+    await sendToN8n(payload);
   } catch (err) {
     console.error('[Submit] error:', err);
   }
