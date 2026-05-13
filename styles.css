@@ -36,10 +36,10 @@
   --warn-border: rgba(212, 32, 32, 0.3);
 
   /* Quiz accent colors */
-  --qa1: #b92b2b;  /* red   — completamente en desacuerdo */
-  --qa2: #1f6ea8;  /* blue  — en desacuerdo */
-  --qa3: #c46010;  /* amber — de acuerdo */
-  --qa4: #197a36;  /* green — completamente de acuerdo */
+  --qa1: #b92b2b;
+  --qa2: #1f6ea8;
+  --qa3: #c46010;
+  --qa4: #197a36;
 
   /* Spacing */
   --s1: 0.375rem;
@@ -86,17 +86,18 @@ html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  scroll-behavior: smooth;
+  /* Sin scroll-behavior en html para evitar conflictos */
 }
 
+/* body ocupa exactamente la pantalla, sin scroll propio */
 body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--t1);
   line-height: 1.55;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow-x: hidden;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;           /* el scroll lo maneja form-main */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -122,13 +123,13 @@ input, textarea, select {
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;             /* altura exacta del viewport */
   max-width: var(--max-w);
   margin: 0 auto;
   position: relative;
+  overflow: hidden;           /* contiene el scroll dentro */
 
-  /* Luz ambiental sutil desde arriba */
   background:
     radial-gradient(ellipse 90% 35% at 50% 0%,
       rgba(212, 32, 32, 0.07) 0%,
@@ -146,8 +147,7 @@ input, textarea, select {
   height: var(--header-h);
   background: rgba(11, 11, 15, 0.92);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;             /* no se comprime */
   z-index: 30;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -211,8 +211,7 @@ input, textarea, select {
 .progress-wrap {
   height: var(--progress-h);
   background: var(--bg-raised);
-  position: sticky;
-  top: var(--header-h);
+  flex-shrink: 0;
   z-index: 29;
 }
 
@@ -233,8 +232,7 @@ input, textarea, select {
   height: var(--indicator-h);
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: calc(var(--header-h) + var(--progress-h));
+  flex-shrink: 0;
   z-index: 28;
 }
 
@@ -255,13 +253,17 @@ input, textarea, select {
 
 /* ── 7. FORM MAIN ── */
 .form-main {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1;                          /* ocupa el espacio restante */
+  overflow-y: scroll;               /* scroll siempre visible en iOS */
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
   padding: var(--s4);
   padding-bottom: calc(var(--nav-h) + var(--s5));
+  /* Fuerza un contexto de scroll propio en iOS */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* ── 8. FORM STEPS — sistema de transición ── */
@@ -403,7 +405,6 @@ input, textarea, select {
   box-shadow: 0 0 0 3px var(--red-glow);
 }
 
-/* Ocultar flechas en input number */
 .field-input[type="number"]::-webkit-inner-spin-button,
 .field-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
 .field-input[type="number"] { -moz-appearance: textfield; }
@@ -459,7 +460,6 @@ input, textarea, select {
     transform     var(--t-fast);
 }
 
-/* Línea de acento izquierda */
 .opt-btn::before {
   content: '';
   position: absolute;
@@ -485,7 +485,6 @@ input, textarea, select {
 
 .opt-btn.is-sel::before { background: var(--red); }
 
-/* Indicador circular */
 .opt-dot {
   width: 18px;
   height: 18px;
@@ -541,7 +540,6 @@ input, textarea, select {
   transition: border-color var(--t-fast), background var(--t-fast);
 }
 
-/* Input real oculto pero accesible */
 .check-opt input[type="checkbox"] {
   position: absolute;
   opacity: 0;
@@ -561,7 +559,6 @@ input, textarea, select {
   background: transparent;
 }
 
-/* Checkmark via CSS */
 .check-opt.is-checked .check-box {
   background: var(--red);
   border-color: var(--red);
@@ -621,7 +618,6 @@ input, textarea, select {
   animation: stepIn var(--t-base) forwards;
 }
 
-/* Error inline de paso */
 .step-error {
   display: none;
   background: var(--warn);
@@ -637,7 +633,6 @@ input, textarea, select {
 .step-error.is-visible { display: block; }
 
 /* ── 17. QUIZ ── */
-
 .quiz-header { margin-bottom: var(--s4); }
 
 .quiz-progress-track {
@@ -697,7 +692,6 @@ input, textarea, select {
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-/* Grid 2×2 de respuestas */
 .quiz-answers {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -727,19 +721,16 @@ input, textarea, select {
 .quiz-ans:active { transform: scale(0.96); }
 .quiz-ans:hover  { filter: brightness(1.08); }
 
-/* Colores individuales */
 .quiz-ans--1 { background: var(--qa1); }
 .quiz-ans--2 { background: var(--qa2); }
 .quiz-ans--3 { background: var(--qa3); }
 .quiz-ans--4 { background: var(--qa4); }
 
-/* Seleccionada: borde blanco */
 .quiz-ans.is-picked {
   border-color: rgba(255, 255, 255, 0.85);
   filter: brightness(1.12);
 }
 
-/* Bloqueadas tras responder */
 .quiz-ans.is-off {
   opacity: 0.4;
   cursor: default;
@@ -776,12 +767,9 @@ input, textarea, select {
 
 /* ── 18. NAV STICKY ── */
 .form-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;            /* ya no es fixed — vive en el flex */
+  flex-shrink: 0;
   width: 100%;
-  max-width: var(--max-w);
   display: flex;
   align-items: center;
   gap: var(--s2);
@@ -849,7 +837,6 @@ input, textarea, select {
   margin-bottom: var(--s2);
 }
 
-/* Logo en pantalla de gracias: ligeramente más grandes */
 .thanks-logos .logo--sabores { width: 52px; height: 52px; }
 .thanks-logos .logo--ext     { width: 46px; height: 46px; }
 
@@ -897,11 +884,10 @@ input, textarea, select {
 /* ── 20. UTILIDADES ── */
 [hidden] { display: none !important; }
 
-/* ── 21. RESPONSIVE — mejoras desktop ── */
+/* ── 21. RESPONSIVE ── */
 @media (max-width: 380px) {
-  /* Dos columnas demasiado estrechas en pantallas muy pequeñas */
   .field-row { grid-template-columns: 1fr; }
-  .quiz-answers { grid-template-columns: 1fr 1fr; } /* mantener 2×2 en quiz */
+  .quiz-answers { grid-template-columns: 1fr 1fr; }
   .quiz-ans { min-height: 78px; font-size: 0.75rem; }
 }
 
@@ -923,6 +909,5 @@ input, textarea, select {
 }
 
 @media (min-width: 600px) and (min-height: 700px) {
-  /* Más aire vertical en pantallas grandes */
   .field { margin-bottom: var(--s5); }
 }
