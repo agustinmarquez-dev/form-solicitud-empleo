@@ -12,12 +12,7 @@
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════
-     APP SHELL
-     data-sheets-url: reemplazar con la URL del
-     Google Apps Script antes de producción.
-════════════════════════════════════════════ -->
-<div id="app" data-sheets-url="">
+<div id="app">
 
   <!-- ── HEADER ── -->
   <header class="app-header" role="banner">
@@ -66,16 +61,6 @@
         <h2 class="step-title" id="title-1">Datos personales</h2>
         <p class="step-sub">Completá tu información de contacto</p>
       </header>
-
-      <!-- Admin: URL del Apps Script -->
-      <div class="config-panel" id="configPanel">
-        <label class="config-label" for="sheetsUrl">
-          <span aria-hidden="true">⚙</span> URL Google Apps Script
-        </label>
-        <input type="url" id="sheetsUrl" class="config-input"
-               placeholder="https://script.google.com/macros/s/XXXX/exec"
-               autocomplete="off" spellcheck="false">
-      </div>
 
       <!-- Nombre + Apellido -->
       <div class="field-row">
@@ -400,13 +385,11 @@
 
     <!-- ──────────────────────────────────────
          PASO 4 · Quiz / Autoevaluación
-         (gestionado íntegramente por app.js)
     ────────────────────────────────────── -->
     <section class="form-step" id="step-4" data-step="4"
              aria-labelledby="title-4">
 
       <header class="quiz-header">
-        <!-- Barra de progreso interna del quiz -->
         <div class="quiz-progress-track" aria-hidden="true">
           <div class="quiz-progress-fill" id="quizProgressFill"></div>
         </div>
@@ -420,14 +403,12 @@
         </h2>
       </header>
 
-      <!-- Pregunta activa (inyectada por JS) -->
       <div class="quiz-body">
         <p class="quiz-question" id="quizQuestion" aria-live="polite"></p>
         <div class="quiz-answers" id="quizAnswers" role="group"
              aria-label="Opciones de respuesta"></div>
       </div>
 
-      <!-- Botón siguiente del quiz -->
       <div class="quiz-footer" id="quizFooter" hidden>
         <button type="button" class="btn-quiz-next" id="btnQuizNext">
           Siguiente →
