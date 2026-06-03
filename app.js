@@ -746,9 +746,10 @@ function registerEvents() {
           background:#0b0b0f;color:#f0efe8;text-align:center;padding:2rem;
         ">
           <span style="font-size:2.5rem">👋</span>
-          <p style="font-size:1.1rem;font-weight:700">¡Hasta pronto!</p>
+          <p style="font-size:1.1rem;font-weight:700">¡Gracias por postularte!</p>
           <p style="font-size:0.875rem;color:#8a8a9e">
-            Podés cerrar esta ventana.
+            Recibimos tu solicitud. Si tu perfil avanza en el proceso de selección,
+          nos pondremos en contacto contigo.
           </p>
         </div>`;
     }, 200);
