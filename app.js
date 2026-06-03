@@ -36,6 +36,47 @@ const CONFIG = {
 
 
 /* ══════════════════════════════════════════════════
+   § 1b. LOCALIDADES POR ZONA GBA
+══════════════════════════════════════════════════ */
+
+const LOCALIDADES = {
+  Norte: [
+    'Acassuso', 'Beccar', 'Benavídez', 'Boulogne', 'Carapachay',
+    'Caseros', 'Del Viso', 'Don Torcuato', 'El Talar', 'Escobar',
+    'Florida', 'Florida Oeste', 'Garín', 'General Pacheco', 'Grand Bourg',
+    'Ingeniero Maschwitz', 'José C. Paz', 'José León Suárez', 'La Lucila',
+    'La Lonja', 'Los Polvorines', 'Los Troncos del Talar', 'Malvinas Argentinas',
+    'Martínez', 'Matheu', 'Maquinista Savio', 'Munro', 'Olivos', 'Pilar',
+    'Presidente Derqui', 'Ricardo Rojas', 'Rincón de Milberg', 'San Andrés',
+    'San Fernando', 'San Isidro', 'San Martín', 'San Miguel', 'Tigre',
+    'Tortuguitas', 'Vicente López', 'Victoria', 'Villa Adelina', 'Villa Ballester',
+    'Villa Lynch', 'Villa Maipú', 'Villa Martelli', 'Villa Rosa', 'Zelaya'
+  ],
+  Sur: [
+    'Adrogué', 'Almirante Brown', 'Avellaneda', 'Banfield', 'Bernal',
+    'Berazategui', 'Bosques', 'Burzaco', 'Canning', 'Claypole',
+    'Don Bosco', 'Don Orione', 'El Jagüel', 'Ezeiza', 'Ezpeleta',
+    'Florencio Varela', 'Glew', 'Guernica', 'Hudson', 'Ingeniero Allan',
+    'Lanús', 'Llavallol', 'Lomas de Zamora', 'Luis Guillón', 'Ministro Rivadavia',
+    'Monte Chingolo', 'Monte Grande', 'Pereyra', 'Presidente Perón',
+    'Quilmes', 'Remedios de Escalada', 'San José', 'San Vicente', 'Sarandí',
+    'Solano', 'Temperley', 'Tristán Suárez', 'Turdera', 'Varela',
+    'Villa Centenario', 'Villa Domínico', 'Wilde'
+  ],
+  Oeste: [
+    'Castelar', 'Ciudadela', 'El Palomar', 'Francisco Álvarez', 'Haedo',
+    'Hurlingham', 'Isidro Casanova', 'Ituzaingó', 'La Reja', 'Laferrere',
+    'Libertad', 'Lomas del Mirador', 'Marcos Paz', 'Mariano Acosta',
+    'Merlo', 'Morón', 'Paso del Rey', 'Rafael Castillo', 'Ramos Mejía',
+    'San Justo', 'Tapiales', 'Villa Luzuriaga', 'Villa Madero',
+    'William Morris'
+  ]
+};
+
+const ZONAS_CON_LOCALIDAD = ['Norte', 'Sur', 'Oeste'];
+
+
+/* ══════════════════════════════════════════════════
    § 2. SCORING
 ══════════════════════════════════════════════════ */
 
@@ -129,7 +170,9 @@ const DOM = {
   quizAnswers:      () => el('quizAnswers'),
   quizFooter:       () => el('quizFooter'),
   btnQuizNext:      () => el('btnQuizNext'),
-  btnExit:          () => el('btnExit')
+  btnExit:          () => el('btnExit'),
+  localidadField:   () => el('localidadField'),
+  localidad:        () => el('localidad')
 };
 
 
@@ -262,6 +305,18 @@ function validateStep1() {
     emailEl.focus();
     showStepError(1, 'Ingresá un email válido.');
     return false;
+  }
+
+  // Localidad obligatoria para zonas del GBA
+  const zoneVal = el('zone')?.value;
+  if (ZONAS_CON_LOCALIDAD.includes(zoneVal)) {
+    const locEl = DOM.localidad();
+    if (!locEl || !locEl.value) {
+      if (locEl) locEl.classList.add('is-error');
+      showStepError(1, 'Seleccioná tu localidad dentro de la zona elegida.');
+      locEl?.focus();
+      return false;
+    }
   }
 
   if (state.puestos.length === 0) {
@@ -623,6 +678,50 @@ function restoreDOMFromState() {
       input.closest('.check-opt')?.classList.add('is-checked');
     }
   });
+
+  // Restaurar campo localidad si la zona guardada lo requiere
+  const savedZone = state.inputs['zone'];
+  if (savedZone && ZONAS_CON_LOCALIDAD.includes(savedZone)) {
+    populateLocalidad(savedZone);
+    const locEl = DOM.localidad();
+    if (locEl && state.inputs['localidad']) locEl.value = state.inputs['localidad'];
+  }
+}
+
+
+/* ══════════════════════════════════════════════════
+   § 15b. LOCALIDAD — populate & toggle
+══════════════════════════════════════════════════ */
+
+function populateLocalidad(zone) {
+  const field = DOM.localidadField();
+  const sel   = DOM.localidad();
+  if (!field || !sel) return;
+
+  const localidades = LOCALIDADES[zone];
+  if (!localidades) {
+    field.hidden = true;
+    sel.value    = '';
+    state.inputs['localidad'] = '';
+    return;
+  }
+
+  sel.innerHTML = '<option value="" disabled selected>Seleccioná tu localidad</option>';
+  localidades.forEach(loc => {
+    const opt      = document.createElement('option');
+    opt.value      = loc;
+    opt.textContent = loc;
+    sel.appendChild(opt);
+  });
+
+  field.hidden = false;
+  field.style.opacity   = '0';
+  field.style.transform = 'translateY(-6px)';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    field.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+    field.style.opacity    = '1';
+    field.style.transform  = 'translateY(0)';
+  }));
 }
 
 
@@ -690,6 +789,17 @@ function registerEvents() {
 
   DOM.sheetsInput()?.addEventListener('input', e => {
     state.sheetsUrl = e.target.value.trim();
+    saveState();
+  });
+
+  // Zona → muestra/oculta localidad
+  el('zone')?.addEventListener('change', e => {
+    const zone = e.target.value;
+    state.inputs['zone'] = zone;
+    state.inputs['localidad'] = '';
+    const locEl = DOM.localidad();
+    if (locEl) { locEl.value = ''; locEl.classList.remove('is-error'); }
+    populateLocalidad(zone);
     saveState();
   });
 }
