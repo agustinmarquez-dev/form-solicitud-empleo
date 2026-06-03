@@ -307,6 +307,11 @@ function validateStep1() {
     return false;
   }
 
+  if (state.puestos.length === 0) {
+    showStepError(1, 'Seleccioná al menos un puesto de interés.');
+    return false;
+  }
+
   // Localidad obligatoria para zonas del GBA
   const zoneVal = el('zone')?.value;
   if (ZONAS_CON_LOCALIDAD.includes(zoneVal)) {
@@ -317,11 +322,6 @@ function validateStep1() {
       locEl?.focus();
       return false;
     }
-  }
-
-  if (state.puestos.length === 0) {
-    showStepError(1, 'Seleccioná al menos un puesto de interés.');
-    return false;
   }
 
   const reqGroups = ['dispNoche', 'cursoMani', 'antecedentes'];
@@ -708,8 +708,8 @@ function populateLocalidad(zone) {
 
   sel.innerHTML = '<option value="" disabled selected>Seleccioná tu localidad</option>';
   localidades.forEach(loc => {
-    const opt      = document.createElement('option');
-    opt.value      = loc;
+    const opt       = document.createElement('option');
+    opt.value       = loc;
     opt.textContent = loc;
     sel.appendChild(opt);
   });
@@ -771,7 +771,7 @@ function registerEvents() {
     });
   });
 
-  ['firstName', 'lastName', 'age', 'phone', 'email', 'zone', 'localidad'].forEach(id => {
+  ['firstName', 'lastName', 'age', 'phone', 'email'].forEach(id => {
     const input = el(id);
     if (!input) return;
 
@@ -787,12 +787,7 @@ function registerEvents() {
     });
   });
 
-  DOM.sheetsInput()?.addEventListener('input', e => {
-    state.sheetsUrl = e.target.value.trim();
-    saveState();
-  });
-
-  // Zona → muestra/oculta localidad
+  // Zona → muestra/oculta y popula localidad
   el('zone')?.addEventListener('change', e => {
     const zone = e.target.value;
     state.inputs['zone'] = zone;
@@ -800,6 +795,18 @@ function registerEvents() {
     const locEl = DOM.localidad();
     if (locEl) { locEl.value = ''; locEl.classList.remove('is-error'); }
     populateLocalidad(zone);
+    saveState();
+  });
+
+  // Localidad select
+  DOM.localidad()?.addEventListener('change', e => {
+    state.inputs['localidad'] = e.target.value;
+    e.target.classList.remove('is-error');
+    saveState();
+  });
+
+  DOM.sheetsInput()?.addEventListener('input', e => {
+    state.sheetsUrl = e.target.value.trim();
     saveState();
   });
 }
