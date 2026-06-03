@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Formulario de postulación — Sabores Express y Hamburguesas Extremas">
+  <title>Postulación — Sabores Express &amp; Hamburguesas Extremas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ── -->
+  <header class="app-header" role="banner">
+    <div class="header-logos" aria-label="Logos corporativos">
+      <img src="./assets/img/sabores-logo.jpg"
+           alt="Sabores Express"
+           class="logo logo--sabores"
+           width="48" height="48"
+           loading="eager">
+      <div class="logo-divider" aria-hidden="true"></div>
+      <img src="./assets/img/extremas-logo.jpg"
+           alt="Hamburguesas Extremas"
+           class="logo logo--ext"
+           width="42" height="42"
+           loading="eager">
+    </div>
+    <div class="header-text">
+      <h1 class="header-title">Solicitud de Empleo</h1>
+      <p class="header-sub">Sabores Express &amp; Hamburguesas Extremas</p>
+    </div>
+  </header>
+
+  <!-- ── PROGRESS ── -->
+  <div class="progress-wrap" aria-hidden="true">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- ── STEP INDICATOR ── -->
+  <div class="step-indicator" id="stepIndicator" aria-live="polite" aria-atomic="true">
+    <span class="step-ind-cur" id="stepIndCur">Paso 1 de 4</span>
+    <span class="step-ind-name" id="stepIndName">Datos personales</span>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       FORM STEPS
+  ════════════════════════════════════════════ -->
+  <main class="form-main" id="formMain">
+
+    <!-- ──────────────────────────────────────
+         PASO 1 · Datos personales
+    ────────────────────────────────────── -->
+    <section class="form-step is-active" id="step-1" data-step="1"
+             aria-labelledby="title-1">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-1">Datos personales</h2>
+        <p class="step-sub">Completá tu información de contacto</p>
+      </header>
+
+      <!-- Nombre + Apellido -->
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="firstName">
+            Nombre <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="text" id="firstName" class="field-input"
+                 autocomplete="given-name" inputmode="text"
+                 placeholder="Tu nombre" data-required>
+        </div>
+        <div class="field">
+          <label class="field-label" for="lastName">
+            Apellido <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="text" id="lastName" class="field-input"
+                 autocomplete="family-name" inputmode="text"
+                 placeholder="Tu apellido" data-required>
+        </div>
+      </div>
+
+      <!-- Edad + Teléfono -->
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="age">
+            Edad <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="number" id="age" class="field-input"
+                 min="16" max="99" inputmode="numeric"
+                 placeholder="Ej: 24" data-required>
+          <span class="field-hint">Preferencia 18–30 años</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="phone">
+            Teléfono <span class="req" aria-label="requerido">*</span>
+          </label>
+          <input type="tel" id="phone" class="field-input"
+                 autocomplete="tel" inputmode="tel"
+                 placeholder="11 xxxx-xxxx" data-required>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label class="field-label" for="email">
+          Email <span class="req" aria-label="requerido">*</span>
+        </label>
+        <input type="email" id="email" class="field-input"
+               autocomplete="email" inputmode="email"
+               placeholder="tucorreo@mail.com" data-required>
+      </div>
+
+      <!-- Zona -->
+      <div class="field">
+        <label class="field-label" for="zone">
+          Zona <span class="req" aria-label="requerido">*</span>
+        </label>
+        <select id="zone" class="field-input" data-required>
+          <option value="" disabled selected>Seleccioná tu zona</option>
+          <option value="CABA">CABA</option>
+          <option value="Sur">Sur</option>
+          <option value="Norte">Norte</option>
+          <option value="Oeste">Oeste</option>
+          <option value="Zárate">Zárate</option>
+          <option value="Mar del Plata">Mar del Plata</option>
+          <option value="Luján">Luján</option>
+          <option value="Rosario">Rosario</option>
+          <option value="La Plata">La Plata</option>
+        </select>
+      </div>
+
+      <!-- Localidad (visible solo para Sur / Norte / Oeste) -->
+      <div class="field" id="localidadField" hidden>
+        <label class="field-label" for="localidad">
+          Localidad <span class="req" aria-label="requerido">*</span>
+        </label>
+        <select id="localidad" class="field-input">
+          <option value="" disabled selected>Seleccioná tu localidad</option>
+        </select>
+      </div>
+
+      <!-- Puestos -->
+      <div class="field">
+        <label class="field-label">
+          Puesto de interés <span class="req" aria-label="requerido">*</span>
+        </label>
+        <div class="check-group" id="puestoGroup" role="group"
+             aria-label="Seleccioná uno o más puestos">
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Empleado Polivalente">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Empleado Polivalente</span>
+          </label>
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Encargado de Turno">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Encargado de Turno</span>
+          </label>
+          <label class="check-opt">
+            <input type="checkbox" name="puesto" value="Gerente de Local">
+            <span class="check-box" aria-hidden="true"></span>
+            <span class="check-lbl">Gerente de Local</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Separador de requisitos -->
+      <div class="section-sep" role="separator">
+        <span class="section-sep-lbl">Requisitos del puesto</span>
+      </div>
+
+      <!-- Disponibilidad nocturna -->
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés disponibilidad de 18:00 a 03:00 hs?
+          <span class="req" aria-label="requerido">*</span>
+        </label>
+        <div class="opt-group" data-group="dispNoche" role="radiogroup"
+             aria-label="Disponibilidad nocturna">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, tengo disponibilidad en ese horario</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no puedo en ese horario</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Curso manipulación (EXCLUYENTE) -->
+      <div class="field">
+        <label class="field-label">
+          Curso de Manipulación de Alimentos
+          <span class="badge-excl" aria-label="requisito excluyente">EXCLUYENTE</span>
+        </label>
+        <p class="field-desc">
+          Declaro que cuento con el Curso de Manipulación de Alimentos vigente
+          o que me encuentro actualmente cursándolo.
+        </p>
+        <div class="opt-group" data-group="cursoMani" role="radiogroup"
+             aria-label="Curso de manipulación de alimentos">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, lo tengo vigente o estoy cursándolo actualmente</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no lo tengo ni lo estoy cursando</span>
+          </button>
+        </div>
+        <div class="excl-warn" id="exclWarn" hidden role="alert">
+          <span aria-hidden="true">⚠</span>
+          <span>Este es un requisito excluyente para continuar la postulación.</span>
+        </div>
+      </div>
+
+      <!-- Antecedentes -->
+      <div class="field">
+        <label class="field-label">
+          Certificado de Antecedentes Penales
+          <span class="req" aria-label="requerido">*</span>
+        </label>
+        <p class="field-desc">
+          ¿Tiene vigente su certificado de antecedentes penales? Recuerde que
+          debe contar con el mismo para poder realizar la entrevista.
+        </p>
+        <div class="opt-group" data-group="antecedentes" role="radiogroup"
+             aria-label="Certificado de antecedentes penales">
+          <button type="button" class="opt-btn" data-value="si">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, está vigente</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no-tramite">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No lo tengo / Está en trámite</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-1 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 2 · Disponibilidad
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-2" data-step="2"
+             aria-labelledby="title-2">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-2">Disponibilidad</h2>
+        <p class="step-sub">La disponibilidad es clave en gastronomía</p>
+      </header>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Cuál es tu disponibilidad horaria?
+          <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispHoraria" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="full-time" data-pts="30">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Full Time — 40+ hs/semana</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="part-tarde" data-pts="25">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Part Time — tarde / noche</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="part-manana" data-pts="15">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Part Time — mañana</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="solo-fds" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Solo fines de semana</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Podés trabajar fines de semana? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispFds" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="always" data-pts="20">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, siempre</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="sometimes" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">A veces</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="never" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No puedo los fines de semana</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Disponibilidad en feriados? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispFeriados" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="yes" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, sin problema</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, no puedo en feriados</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Podés incorporarte de forma inmediata? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="dispInicio" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="now" data-pts="10">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, puedo empezar ya</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="2weeks" data-pts="5">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">En 1–2 semanas</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="1month" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">En 1 mes o más</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-2 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 3 · Experiencia
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-3" data-step="3"
+             aria-labelledby="title-3">
+
+      <header class="step-header">
+        <h2 class="step-title" id="title-3">Experiencia</h2>
+        <p class="step-sub">Contanos tu historia laboral</p>
+      </header>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés experiencia en gastronomía o atención? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="expGastro" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="+2" data-pts="20">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, más de 2 años</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="1-2" data-pts="15">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Entre 1 y 2 años</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="lt1" data-pts="8">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Algo, menos de un año</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="0" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, es mi primera vez</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">
+          ¿Tenés experiencia en caja o manejo de dinero? <span class="req">*</span>
+        </label>
+        <div class="opt-group" data-group="expCaja" role="radiogroup">
+          <button type="button" class="opt-btn" data-value="yes" data-pts="5">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">Sí, tengo experiencia</span>
+          </button>
+          <button type="button" class="opt-btn" data-value="no" data-pts="0">
+            <span class="opt-dot" aria-hidden="true"></span>
+            <span class="opt-lbl">No, nunca manejé caja</span>
+          </button>
+        </div>
+      </div>
+
+    </section><!-- /step-3 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 4 · Quiz / Autoevaluación
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-4" data-step="4"
+             aria-labelledby="title-4">
+
+      <header class="quiz-header">
+        <div class="quiz-progress-track" aria-hidden="true">
+          <div class="quiz-progress-fill" id="quizProgressFill"></div>
+        </div>
+        <div class="quiz-meta">
+          <span class="quiz-counter" id="quizCounter"
+                aria-live="polite" aria-atomic="true">Pregunta 1 de 12</span>
+          <span class="quiz-tag" aria-hidden="true">Autoevaluación</span>
+        </div>
+        <h2 class="quiz-title" id="title-4">
+          Respondé con honestidad — no hay respuestas incorrectas.
+        </h2>
+      </header>
+
+      <div class="quiz-body">
+        <p class="quiz-question" id="quizQuestion" aria-live="polite"></p>
+        <div class="quiz-answers" id="quizAnswers" role="group"
+             aria-label="Opciones de respuesta"></div>
+      </div>
+
+      <div class="quiz-footer" id="quizFooter" hidden>
+        <button type="button" class="btn-quiz-next" id="btnQuizNext">
+          Siguiente →
+        </button>
+      </div>
+
+    </section><!-- /step-4 -->
+
+
+    <!-- ──────────────────────────────────────
+         PASO 5 · Gracias (pantalla final)
+    ────────────────────────────────────── -->
+    <section class="form-step" id="step-5" data-step="5"
+             aria-labelledby="title-5">
+
+      <div class="thanks-wrap">
+        <div class="thanks-logos" aria-hidden="true">
+          <img src="./assets/img/sabores-logo.jpg"
+               alt="" class="logo logo--sabores" width="56" height="56" loading="lazy">
+          <img src="./assets/img/extremas-logo.jpg"
+               alt="" class="logo logo--ext" width="50" height="50" loading="lazy">
+        </div>
+        <div class="thanks-icon" aria-hidden="true">🎉</div>
+        <h2 class="thanks-title" id="title-5">¡Gracias por postularte!</h2>
+        <p class="thanks-msg">
+          Recibimos tu solicitud. Si tu perfil avanza en el proceso de selección,
+          nos pondremos en contacto contigo.
+        </p>
+        <button type="button" class="btn-exit" id="btnExit">
+          Cerrar
+        </button>
+      </div>
+
+    </section><!-- /step-5 -->
+
+  </main><!-- /form-main -->
+
+  <!-- ── NAV STICKY ── -->
+  <nav class="form-nav" id="formNav" aria-label="Navegación del formulario">
+    <button type="button" class="btn-back" id="btnBack" hidden
+            aria-label="Volver al paso anterior">
+      ← Volver
+    </button>
+    <button type="button" class="btn-next" id="btnNext"
+            aria-label="Continuar al siguiente paso">
+      Continuar
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -5,7 +5,7 @@
  * Sabores Express & Hamburguesas Extremas
  *
  * Arquitectura: Vanilla JS puro | Sin dependencias
- * Envío: Supabase REST API (batch → Google Sheets vía n8n schedule)
+ * Envío: n8n Webhook → Google Sheets
  * ─────────────────────────────────────────────────────────────────
  */
 
@@ -16,9 +16,8 @@
 ══════════════════════════════════════════════════ */
 
 const CONFIG = {
-  /** Supabase */
-  supabaseUrl: 'https://XXXX.supabase.co',   // ← reemplazá con tu Project URL
-  supabaseKey: 'TU_ANON_KEY',                 // ← reemplazá con tu anon/public key
+  /** n8n Webhook */
+  n8nWebhookUrl: 'https://kevin9705.app.n8n.cloud/webhook/98785e25-1eeb-4732-9881-9cb61694890b',
 
   /** Claves de localStorage */
   storageKey: 'ats_gastro_v2',
@@ -33,6 +32,48 @@ const CONFIG = {
   /** Milisegundos hasta que el borrador expira (24 h) */
   draftTTL: 86_400_000
 };
+
+
+/* ══════════════════════════════════════════════════
+   § 1b. LOCALIDADES POR ZONA GBA
+══════════════════════════════════════════════════ */
+
+const LOCALIDADES = {
+  Norte: [
+    'Acassuso', 'Beccar', 'Benavídez', 'Boulogne', 'Carapachay',
+    'Caseros', 'Del Viso', 'Don Torcuato', 'El Talar', 'Escobar',
+    'Florida', 'Florida Oeste', 'Garín', 'General Pacheco', 'Grand Bourg',
+    'Ingeniero Maschwitz', 'José C. Paz', 'José León Suárez', 'La Lucila',
+    'La Lonja', 'Los Polvorines', 'Los Troncos del Talar', 'Malvinas Argentinas',
+    'Martínez', 'Matheu', 'Maquinista Savio', 'Munro', 'Olivos', 'Pilar',
+    'Presidente Derqui', 'Ricardo Rojas', 'Rincón de Milberg', 'San Andrés',
+    'San Fernando', 'San Isidro', 'San Martín', 'San Miguel', 'Tigre',
+    'Tortuguitas', 'Vicente López', 'Victoria', 'Villa Adelina', 'Villa Ballester',
+    'Villa Lynch', 'Villa Maipú', 'Villa Martelli', 'Villa Rosa', 'Zelaya'
+  ],
+  Sur: [
+    'Adrogué', 'Almirante Brown', 'Avellaneda', 'Banfield', 'Bernal',
+    'Berazategui', 'Bosques', 'Burzaco', 'Canning', 'Claypole',
+    'Don Bosco', 'Don Orione', 'El Jagüel', 'Ezeiza', 'Ezpeleta',
+    'Florencio Varela', 'Glew', 'Guernica', 'Hudson', 'Ingeniero Allan',
+    'Lanús', 'Llavallol', 'Lomas de Zamora', 'Luis Guillón', 'Ministro Rivadavia',
+    'Monte Chingolo', 'Monte Grande', 'Pereyra', 'Presidente Perón',
+    'Quilmes', 'Remedios de Escalada', 'San José', 'San Vicente', 'Sarandí',
+    'Solano', 'Temperley', 'Tristán Suárez', 'Turdera', 'Varela',
+    'Villa Centenario', 'Villa Domínico', 'Wilde'
+  ],
+  Oeste: [
+    'Castelar', 'Ciudadela', 'El Palomar', 'Francisco Álvarez', 'Haedo',
+    'Hurlingham', 'Isidro Casanova', 'Ituzaingó', 'La Reja', 'Laferrere',
+    'Libertad', 'Lomas del Mirador', 'Marcos Paz', 'Mariano Acosta',
+    'Merlo', 'Morón', 'Paso del Rey', 'Rafael Castillo', 'Ramos Mejía',
+    'San Justo', 'Tapiales', 'Villa Luzuriaga', 'Villa Madero',
+    'William Morris'
+  ]
+};
+
+/** Zonas del GBA que requieren selección de localidad */
+const ZONAS_CON_LOCALIDAD = ['Norte', 'Sur', 'Oeste'];
 
 
 /* ══════════════════════════════════════════════════
@@ -129,7 +170,9 @@ const DOM = {
   quizAnswers:      () => el('quizAnswers'),
   quizFooter:       () => el('quizFooter'),
   btnQuizNext:      () => el('btnQuizNext'),
-  btnExit:          () => el('btnExit')
+  btnExit:          () => el('btnExit'),
+  localidadField:   () => el('localidadField'),
+  localidad:        () => el('localidad')
 };
 
 
@@ -252,6 +295,18 @@ function validateStep1() {
       input.classList.add('is-error');
       input.focus();
       showStepError(1, 'Por favor completá todos los campos obligatorios.');
+      return false;
+    }
+  }
+
+  // Localidad obligatoria para zonas del GBA
+  const zoneVal = el('zone')?.value;
+  if (ZONAS_CON_LOCALIDAD.includes(zoneVal)) {
+    const locEl = DOM.localidad();
+    if (!locEl || !locEl.value) {
+      if (locEl) locEl.classList.add('is-error');
+      showStepError(1, 'Seleccioná tu localidad dentro de la zona elegida.');
+      locEl?.focus();
       return false;
     }
   }
@@ -503,7 +558,7 @@ function calculateScore() {
 
 
 /* ══════════════════════════════════════════════════
-   § 14. ENVÍO — Supabase REST API
+   § 14. ENVÍO — n8n Webhook
 ══════════════════════════════════════════════════ */
 
 function buildPayload(scores) {
@@ -517,6 +572,7 @@ function buildPayload(scores) {
     email:         i.email    || '',
     telefono:      i.phone    || '',
     zona:          i.zone     || '',
+    localidad:     i.localidad || '',
     puesto:        state.puestos.join(', ') || 'No especificado',
 
     disp_noche:    val('dispNoche'),
@@ -537,28 +593,20 @@ function buildPayload(scores) {
     pts_total:     scores.total,
     perfil:        `${scores.profile.code} - ${scores.profile.label}`,
 
-    quiz_detalle:  JSON.stringify(state.quizAnswers),
-
-    enviado_drive: false
+    quiz_detalle:  JSON.stringify(state.quizAnswers)
   };
 }
 
-// ── Supabase: inserta una fila en la tabla postulaciones ──────────
-async function sendToSupabase(payload) {
-  const response = await fetch(`${CONFIG.supabaseUrl}/rest/v1/postulaciones`, {
+// ── n8n: envía todos los campos + timestamp legible ──────────────
+async function sendToN8n(payload) {
+  await fetch(CONFIG.n8nWebhookUrl, {
     method:  'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey':        CONFIG.supabaseKey,
-      'Authorization': `Bearer ${CONFIG.supabaseKey}`
-    },
-    body: JSON.stringify(payload)
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify({
+      ...payload,
+      created_at: new Date().toLocaleString('es-AR')
+    })
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Supabase error ${response.status}: ${error}`);
-  }
 }
 
 async function submitForm() {
@@ -573,8 +621,8 @@ async function submitForm() {
   }
 
   try {
-    // → Supabase (n8n lo procesa en batch hacia Google Sheets)
-    await sendToSupabase(payload);
+    // → n8n Webhook (filtra y envía a Google Sheets)
+    await sendToN8n(payload);
   } catch (err) {
     console.error('[Submit] error:', err);
   }
@@ -596,6 +644,16 @@ function restoreDOMFromState() {
       input.value = state.inputs[id];
     }
   });
+
+  // Restaurar campo localidad si corresponde
+  const savedZone = state.inputs['zone'];
+  if (savedZone && ZONAS_CON_LOCALIDAD.includes(savedZone)) {
+    populateLocalidad(savedZone);
+    const locEl = DOM.localidad();
+    if (locEl && state.inputs['localidad']) {
+      locEl.value = state.inputs['localidad'];
+    }
+  }
 
   const sheetsEl = DOM.sheetsInput();
   if (sheetsEl && state.sheetsUrl) sheetsEl.value = state.sheetsUrl;
@@ -622,6 +680,45 @@ function restoreDOMFromState() {
       input.closest('.check-opt')?.classList.add('is-checked');
     }
   });
+}
+
+
+/* ══════════════════════════════════════════════════
+   § 15b. LOCALIDAD — populate & toggle
+══════════════════════════════════════════════════ */
+
+function populateLocalidad(zone) {
+  const field = DOM.localidadField();
+  const sel   = DOM.localidad();
+  if (!field || !sel) return;
+
+  const localidades = LOCALIDADES[zone];
+  if (!localidades) {
+    field.hidden = true;
+    sel.value    = '';
+    state.inputs['localidad'] = '';
+    return;
+  }
+
+  // Rebuild options
+  sel.innerHTML = '<option value="" disabled selected>Seleccioná tu localidad</option>';
+  localidades.forEach(loc => {
+    const opt   = document.createElement('option');
+    opt.value   = loc;
+    opt.textContent = loc;
+    sel.appendChild(opt);
+  });
+
+  field.hidden = false;
+
+  // Smooth appearance
+  field.style.opacity   = '0';
+  field.style.transform = 'translateY(-6px)';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    field.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+    field.style.opacity    = '1';
+    field.style.transform  = 'translateY(0)';
+  }));
 }
 
 
@@ -685,6 +782,30 @@ function registerEvents() {
       state.inputs[id] = input.value;
       saveState();
     });
+  });
+
+  // Listener especial para zona: muestra/oculta localidad
+  el('zone')?.addEventListener('change', e => {
+    const zone = e.target.value;
+    state.inputs['zone'] = zone;
+
+    // Limpiar localidad anterior
+    state.inputs['localidad'] = '';
+    const locEl = DOM.localidad();
+    if (locEl) {
+      locEl.value = '';
+      locEl.classList.remove('is-error');
+    }
+
+    populateLocalidad(zone);
+    saveState();
+  });
+
+  // Localidad
+  DOM.localidad()?.addEventListener('change', e => {
+    state.inputs['localidad'] = e.target.value;
+    e.target.classList.remove('is-error');
+    saveState();
   });
 
   DOM.sheetsInput()?.addEventListener('input', e => {
