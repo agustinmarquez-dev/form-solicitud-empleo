@@ -50,7 +50,7 @@ const LOCALIDADES = {
     'Presidente Derqui', 'Ricardo Rojas', 'Rincón de Milberg', 'San Andrés',
     'San Fernando', 'San Isidro', 'San Martín', 'San Miguel', 'Tigre',
     'Tortuguitas', 'Vicente López', 'Victoria', 'Villa Adelina', 'Villa Ballester',
-    'Villa Lynch', 'Villa Maipú', 'Villa Martelli', 'Villa Rosa', 'Zelaya'
+    'Villa Lynch', 'Villa Maipú', 'Villa Martelli', 'Villa Rosa', 'Zelaya' , 'Sourdeaux'
   ],
   Sur: [
     'Adrogué', 'Almirante Brown', 'Avellaneda', 'Banfield', 'Bernal',
