@@ -863,11 +863,40 @@ input, textarea, select {
   font-size: 0.9375rem;
   color: var(--t2);
   line-height: 1.65;
-  max-width: 290px;
+  max-width: 440px;
+}
+
+.thanks-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--s2);
+  padding: 0.9375rem 1.5rem;
+  border: 1.5px solid var(--red);
+  border-radius: var(--r-md);
+  background: var(--red);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+}
+
+.thanks-cta:hover {
+  background: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+.thanks-cta:active { transform: scale(0.98); }
+
+.thanks-cta:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--red) 35%, transparent);
+  outline-offset: 3px;
 }
 
 .btn-exit {
-  margin-top: var(--s3);
+  margin-top: var(--s1);
   background: var(--bg-raised);
   color: var(--t1);
   border: 1.5px solid var(--border);
