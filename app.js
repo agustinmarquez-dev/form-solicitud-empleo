@@ -36,10 +36,22 @@ const CONFIG = {
 
 
 /* ══════════════════════════════════════════════════
-   § 1b. LOCALIDADES POR ZONA GBA
+   § 1b. LOCALIDADES Y BARRIOS POR ZONA
 ══════════════════════════════════════════════════ */
 
 const LOCALIDADES = {
+  CABA: [
+    'Agronomía', 'Almagro', 'Balvanera', 'Barracas', 'Belgrano', 'Boedo',
+    'Caballito', 'Chacarita', 'Coghlan', 'Colegiales', 'Constitución', 'Flores',
+    'Floresta', 'La Boca', 'La Paternal', 'Liniers', 'Mataderos', 'Monte Castro',
+    'Montserrat', 'Nueva Pompeya', 'Nuñez', 'Palermo', 'Parque Avellaneda',
+    'Parque Chacabuco', 'Parque Chas', 'Parque Patricios', 'Puerto Madero',
+    'Recoleta', 'Retiro', 'Saavedra', 'San Cristóbal', 'San Nicolás', 'San Telmo',
+    'Versalles', 'Villa Crespo', 'Villa Devoto', 'Villa General Mitre',
+    'Villa Lugano', 'Villa Luro', 'Villa Ortúzar', 'Villa Pueyrredón', 'Villa Real',
+    'Villa Riachuelo', 'Villa Santa Rita', 'Villa Soldati', 'Villa Urquiza',
+    'Villa del Parque', 'Vélez Sarsfield'
+  ],
   Norte: [
     'Acassuso', 'Beccar', 'Bellavista', 'Benavídez', 'Boulogne', 'Camapana', 'Carapachay',
     'Caseros', 'Del Viso', 'Don Torcuato', 'El Talar', 'Escobar',
@@ -73,7 +85,7 @@ const LOCALIDADES = {
   ]
 };
 
-const ZONAS_CON_LOCALIDAD = ['Norte', 'Sur', 'Oeste'];
+const ZONAS_CON_UBICACION = ['CABA', 'Norte', 'Sur', 'Oeste'];
 
 
 /* ══════════════════════════════════════════════════
@@ -312,13 +324,14 @@ function validateStep1() {
     return false;
   }
 
-  // Localidad obligatoria para zonas del GBA
+  // Barrio o localidad obligatorio para las zonas que ofrecen el selector
   const zoneVal = el('zone')?.value;
-  if (ZONAS_CON_LOCALIDAD.includes(zoneVal)) {
+  if (ZONAS_CON_UBICACION.includes(zoneVal)) {
     const locEl = DOM.localidad();
     if (!locEl || !locEl.value) {
       if (locEl) locEl.classList.add('is-error');
-      showStepError(1, 'Seleccioná tu localidad dentro de la zona elegida.');
+      const tipoUbicacion = zoneVal === 'CABA' ? 'barrio' : 'localidad';
+      showStepError(1, `Seleccioná tu ${tipoUbicacion} dentro de la zona elegida.`);
       locEl?.focus();
       return false;
     }
@@ -679,9 +692,9 @@ function restoreDOMFromState() {
     }
   });
 
-  // Restaurar campo localidad si la zona guardada lo requiere
+  // Restaurar barrio o localidad si la zona guardada lo requiere
   const savedZone = state.inputs['zone'];
-  if (savedZone && ZONAS_CON_LOCALIDAD.includes(savedZone)) {
+  if (savedZone && ZONAS_CON_UBICACION.includes(savedZone)) {
     populateLocalidad(savedZone);
     const locEl = DOM.localidad();
     if (locEl && state.inputs['localidad']) locEl.value = state.inputs['localidad'];
@@ -706,7 +719,14 @@ function populateLocalidad(zone) {
     return;
   }
 
-  sel.innerHTML = '<option value="" disabled selected>Seleccioná tu localidad</option>';
+  const esCaba = zone === 'CABA';
+  const label = field.querySelector('.field-label');
+  if (label?.firstChild) {
+    label.firstChild.textContent = esCaba ? 'Barrio ' : 'Localidad ';
+  }
+
+  const placeholder = esCaba ? 'Seleccioná tu barrio' : 'Seleccioná tu localidad';
+  sel.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
   localidades.forEach(loc => {
     const opt       = document.createElement('option');
     opt.value       = loc;
