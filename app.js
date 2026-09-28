@@ -41,12 +41,12 @@ const CONFIG = {
 
 const LOCALIDADES = {
   Norte: [
-    'Acassuso', 'Beccar', 'Benavídez', 'Boulogne', 'Camapana', 'Carapachay',
+    'Acassuso', 'Beccar', 'Bellavista', 'Benavídez', 'Boulogne', 'Camapana', 'Carapachay',
     'Caseros', 'Del Viso', 'Don Torcuato', 'El Talar', 'Escobar',
     'Florida', 'Florida Oeste', 'Garín', 'General Pacheco', 'Grand Bourg',
     'Ingeniero Maschwitz', 'José C. Paz', 'José León Suárez', 'La Lucila',
     'La Lonja', 'Los Polvorines', 'Los Troncos del Talar', 'Malvinas Argentinas',
-    'Martínez', 'Matheu', 'Maquinista Savio', 'Munro', 'Olivos', 'Pilar',
+    'Martínez', 'Matheu', 'Maquinista Savio', 'Munro', 'Muñiz' 'Olivos', 'Pilar',
     'Presidente Derqui', 'Ricardo Rojas', 'Rincón de Milberg', 'San Andrés',
     'San Fernando', 'San Isidro', 'San Martín', 'San Miguel', 'Sourdeaux', 'Tigre',
     'Tortuguitas', 'Vicente López', 'Victoria', 'Villa Adelina', 'Villa Ballester',
