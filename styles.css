@@ -520,7 +520,7 @@ input, textarea, select {
 
 .opt-btn.is-sel .opt-lbl { color: #fff; }
 
-/* ── 15. CHECKBOX GROUP ── */
+/* ── 15. PUESTO DE INTERÉS ── */
 .check-group {
   display: flex;
   flex-direction: column;
@@ -540,7 +540,7 @@ input, textarea, select {
   transition: border-color var(--t-fast), background var(--t-fast);
 }
 
-.check-opt input[type="checkbox"] {
+.check-opt input[type="radio"] {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -551,7 +551,7 @@ input, textarea, select {
 .check-box {
   width: 20px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 50%;
   border: 2px solid var(--t3);
   flex-shrink: 0;
   position: relative;
@@ -567,14 +567,9 @@ input, textarea, select {
 .check-opt.is-checked .check-box::after {
   content: '';
   position: absolute;
-  left: 5px;
-  top: 2px;
-  width: 6px;
-  height: 10px;
-  border: 2px solid #fff;
-  border-top: none;
-  border-left: none;
-  transform: rotate(44deg);
+  inset: 5px;
+  border-radius: 50%;
+  background: #fff;
 }
 
 .check-opt.is-checked {
