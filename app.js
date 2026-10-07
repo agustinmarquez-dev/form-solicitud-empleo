@@ -792,6 +792,10 @@ function registerEvents() {
       });
       state.puestos = input.checked ? [input.value] : [];
       saveState();
+
+      if (input.checked && ['Encargado de Turno', 'Gerente de Local'].includes(input.value)) {
+        window.alert('Se requiere experiencia previa comprobable en rubros gastronómicos exclusivamente.');
+      }
     });
   });
 
