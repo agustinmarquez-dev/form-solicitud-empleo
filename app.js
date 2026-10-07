@@ -320,7 +320,7 @@ function validateStep1() {
   }
 
   if (state.puestos.length === 0) {
-    showStepError(1, 'Seleccioná al menos un puesto de interés.');
+    showStepError(1, 'Seleccioná un puesto de interés.');
     return false;
   }
 
@@ -684,13 +684,16 @@ function restoreDOMFromState() {
     }
   });
 
-  state.puestos.forEach(val => {
-    const input = document.querySelector(`input[name="puesto"][value="${val}"]`);
+  // Los borradores anteriores podían contener más de un puesto: se conserva el primero.
+  const puestoGuardado = state.puestos[0];
+  if (puestoGuardado) {
+    const input = document.querySelector(`input[name="puesto"][value="${puestoGuardado}"]`);
     if (input) {
       input.checked = true;
       input.closest('.check-opt')?.classList.add('is-checked');
+      state.puestos = [puestoGuardado];
     }
-  });
+  }
 
   // Restaurar barrio o localidad si la zona guardada lo requiere
   const savedZone = state.inputs['zone'];
@@ -784,10 +787,10 @@ function registerEvents() {
 
   document.querySelectorAll('input[name="puesto"]').forEach(input => {
     input.addEventListener('change', () => {
-      input.closest('.check-opt')?.classList.toggle('is-checked', input.checked);
-      state.puestos = Array.from(
-        document.querySelectorAll('input[name="puesto"]:checked')
-      ).map(cb => cb.value);
+      document.querySelectorAll('input[name="puesto"]').forEach(option => {
+        option.closest('.check-opt')?.classList.toggle('is-checked', option.checked);
+      });
+      state.puestos = input.checked ? [input.value] : [];
       saveState();
     });
   });
