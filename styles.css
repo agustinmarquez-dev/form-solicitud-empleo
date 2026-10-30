@@ -1,45 +1,45 @@
 /* ══════════════════════════════════════════════════════════════
    ATS Gastronómico — styles.css
-   Mobile-first | Dark premium | Red + Gold accent
-   Paleta: fondo oscuro · rojo #d42020 · gold #c9953a
+   Mobile-first | Light editorial | Coral + warm neutrals
+   Paleta: marfil · carbón cálido · coral #ef4523
    ══════════════════════════════════════════════════════════════ */
 
 /* ── 1. VARIABLES ── */
 :root {
   /* Backgrounds */
-  --bg:         #0b0b0f;
-  --bg-surface: #13131a;
-  --bg-raised:  #1b1b24;
-  --bg-hover:   #21212d;
+  --bg:         #f5f1ea;
+  --bg-surface: #fffaf5;
+  --bg-raised:  #ffffff;
+  --bg-hover:   #f8e9df;
 
   /* Borders */
-  --border:       rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(255, 255, 255, 0.18);
+  --border:       rgba(36, 31, 28, 0.14);
+  --border-focus: rgba(36, 31, 28, 0.34);
 
   /* Brand */
-  --red:       #d42020;
-  --red-dark:  #a61919;
-  --red-light: #e83434;
-  --red-glow:  rgba(212, 32, 32, 0.14);
+  --red:       #ef4523;
+  --red-dark:  #c9351b;
+  --red-light: #f2694b;
+  --red-glow:  rgba(239, 69, 35, 0.18);
 
-  --gold:      #c9953a;
-  --gold-lt:   #e0b050;
-  --gold-glow: rgba(201, 149, 58, 0.12);
+  --gold:      #9a543d;
+  --gold-lt:   #c77758;
+  --gold-glow: rgba(154, 84, 61, 0.13);
 
   /* Text */
-  --t1: #f0efe8;
-  --t2: #8a8a9e;
-  --t3: #474758;
+  --t1: #241f1c;
+  --t2: #625b54;
+  --t3: #91877f;
 
   /* Semantic */
-  --warn: rgba(212, 32, 32, 0.1);
-  --warn-border: rgba(212, 32, 32, 0.3);
+  --warn: #fff0eb;
+  --warn-border: rgba(201, 53, 27, 0.34);
 
   /* Quiz accent colors */
-  --qa1: #b92b2b;
-  --qa2: #1f6ea8;
-  --qa3: #c46010;
-  --qa4: #197a36;
+  --qa1: #e75837;
+  --qa2: #47352e;
+  --qa3: #b8653e;
+  --qa4: #637c62;
 
   /* Spacing */
   --s1: 0.375rem;
@@ -71,8 +71,7 @@
   --t-slow: 0.38s var(--ease-out);
 
   /* Typography */
-  --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue',
-          'Segoe UI', Arial, sans-serif;
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 /* ── 2. RESET ── */
@@ -132,7 +131,7 @@ input, textarea, select {
 
   background:
     radial-gradient(ellipse 90% 35% at 50% 0%,
-      rgba(212, 32, 32, 0.07) 0%,
+      rgba(239, 69, 35, 0.10) 0%,
       transparent 60%
     ),
     var(--bg);
@@ -145,7 +144,7 @@ input, textarea, select {
   gap: var(--s3);
   padding: 0 var(--s4);
   height: var(--header-h);
-  background: rgba(11, 11, 15, 0.92);
+  background: rgba(255, 250, 245, 0.94);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;             /* no se comprime */
   z-index: 30;
@@ -302,8 +301,8 @@ input, textarea, select {
 
 /* ── 10. CONFIG PANEL ── */
 .config-panel {
-  background: rgba(201, 149, 58, 0.05);
-  border: 1px solid rgba(201, 149, 58, 0.18);
+  background: rgba(154, 84, 61, 0.07);
+  border: 1px solid rgba(154, 84, 61, 0.20);
   border-radius: var(--r-md);
   padding: var(--s3);
   margin-bottom: var(--s4);
@@ -324,8 +323,8 @@ input, textarea, select {
 
 .config-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(201, 149, 58, 0.25);
+  background: #fffdfa;
+  border: 1px solid rgba(154, 84, 61, 0.30);
   border-radius: var(--r-sm);
   padding: 0.5rem 0.75rem;
   font-size: 0.78rem;
@@ -479,8 +478,8 @@ input, textarea, select {
 
 .opt-btn.is-sel {
   border-color: var(--red);
-  background: rgba(212, 32, 32, 0.06);
-  box-shadow: 0 0 0 1px rgba(212, 32, 32, 0.2);
+  background: rgba(239, 69, 35, 0.08);
+  box-shadow: 0 0 0 1px rgba(239, 69, 35, 0.22);
 }
 
 .opt-btn.is-sel::before { background: var(--red); }
@@ -518,7 +517,7 @@ input, textarea, select {
   line-height: 1.4;
 }
 
-.opt-btn.is-sel .opt-lbl { color: #fff; }
+.opt-btn.is-sel .opt-lbl { color: var(--t1); }
 
 /* ── 15. PUESTO DE INTERÉS ── */
 .check-group {
@@ -574,7 +573,7 @@ input, textarea, select {
 
 .check-opt.is-checked {
   border-color: var(--red);
-  background: rgba(212, 32, 32, 0.06);
+  background: rgba(239, 69, 35, 0.08);
 }
 
 .check-lbl {
@@ -587,8 +586,8 @@ input, textarea, select {
 .badge-excl {
   display: inline-flex;
   align-items: center;
-  background: rgba(212, 32, 32, 0.12);
-  color: #ff7070;
+  background: #fde3db;
+  color: #a9301a;
   font-size: 0.6rem;
   font-weight: 800;
   padding: 2px 7px;
@@ -608,7 +607,7 @@ input, textarea, select {
   padding: var(--s3);
   margin-top: var(--s2);
   font-size: 0.85rem;
-  color: #ff8585;
+  color: #9f301c;
   line-height: 1.5;
   animation: stepIn var(--t-base) forwards;
 }
@@ -621,7 +620,7 @@ input, textarea, select {
   padding: var(--s3);
   margin-bottom: var(--s3);
   font-size: 0.85rem;
-  color: #ff8585;
+  color: #9f301c;
   animation: stepIn var(--t-base) forwards;
 }
 
@@ -632,7 +631,7 @@ input, textarea, select {
 
 .quiz-progress-track {
   height: 3px;
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(36, 31, 28, 0.10);
   border-radius: var(--r-pill);
   overflow: hidden;
   margin-bottom: var(--s3);
@@ -705,7 +704,7 @@ input, textarea, select {
   border: 2px solid transparent;
   font-size: 0.8rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.92);
+  color: #fffdf9;
   text-align: center;
   line-height: 1.3;
   cursor: pointer;
@@ -770,7 +769,7 @@ input, textarea, select {
   gap: var(--s2);
   padding: var(--s3) var(--s4);
   padding-bottom: calc(var(--s3) + env(safe-area-inset-bottom, 0px));
-  background: rgba(11, 11, 15, 0.96);
+  background: rgba(255, 250, 245, 0.96);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -941,9 +940,9 @@ input, textarea, select {
   body {
     padding: 1.5rem;
     background:
-      radial-gradient(circle at 12% 18%, rgba(212, 32, 32, 0.12), transparent 28rem),
-      radial-gradient(circle at 88% 82%, rgba(201, 149, 58, 0.07), transparent 25rem),
-      #07070a;
+      radial-gradient(circle at 12% 18%, rgba(239, 69, 35, 0.13), transparent 28rem),
+      radial-gradient(circle at 88% 82%, rgba(184, 101, 62, 0.10), transparent 25rem),
+      #eee7de;
   }
 
   #app {
@@ -951,9 +950,9 @@ input, textarea, select {
     max-width: 900px;
     height: calc(100vh - 3rem);
     height: calc(100dvh - 3rem);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    border: 1px solid rgba(36, 31, 28, 0.13);
     border-radius: 24px;
-    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.46);
+    box-shadow: 0 28px 80px rgba(67, 43, 31, 0.16);
   }
 
   .app-header {
@@ -963,8 +962,8 @@ input, textarea, select {
     padding: 0 2.25rem;
     overflow: hidden;
     background:
-      linear-gradient(110deg, rgba(212, 32, 32, 0.12), transparent 46%),
-      rgba(15, 15, 20, 0.96);
+      linear-gradient(110deg, rgba(239, 69, 35, 0.12), transparent 46%),
+      rgba(255, 250, 245, 0.97);
   }
 
   .app-header::after {
@@ -974,11 +973,11 @@ input, textarea, select {
     top: -72px;
     width: 220px;
     height: 220px;
-    border: 1px solid rgba(212, 32, 32, 0.2);
+    border: 1px solid rgba(239, 69, 35, 0.24);
     border-radius: 50%;
     box-shadow:
-      0 0 0 28px rgba(212, 32, 32, 0.035),
-      0 0 0 56px rgba(212, 32, 32, 0.02);
+      0 0 0 28px rgba(239, 69, 35, 0.055),
+      0 0 0 56px rgba(239, 69, 35, 0.025);
     pointer-events: none;
   }
 
@@ -995,7 +994,7 @@ input, textarea, select {
   .header-sub {
     margin-top: 0.35rem;
     font-size: 0.78rem;
-    color: #aaaaba;
+    color: var(--t2);
   }
 
   .step-indicator {
@@ -1013,7 +1012,7 @@ input, textarea, select {
     padding: 2.5rem 3rem;
     padding-bottom: 2.5rem;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+    scrollbar-color: rgba(36, 31, 28, 0.20) transparent;
   }
 
   .form-main::-webkit-scrollbar {
@@ -1025,14 +1024,14 @@ input, textarea, select {
   }
 
   .form-main::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.14);
+    background: rgba(36, 31, 28, 0.16);
     border: 2px solid transparent;
     border-radius: var(--r-pill);
     background-clip: padding-box;
   }
 
   .form-main::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.24);
+    background: rgba(36, 31, 28, 0.28);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
@@ -1133,7 +1132,7 @@ input, textarea, select {
     justify-content: flex-start;
     gap: 0.65rem;
     background:
-      linear-gradient(180deg, rgba(212, 32, 32, 0.075), transparent 45%),
+      linear-gradient(180deg, rgba(239, 69, 35, 0.10), transparent 45%),
       var(--bg-surface);
     border-right: 1px solid var(--border);
     border-bottom: 0;
