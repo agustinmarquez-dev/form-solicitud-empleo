@@ -1,6 +1,6 @@
 # Formulario de solicitud de empleo
 
-Aplicación web de postulación laboral para **Sabores Express** y **Hamburguesas Extremas**. Guía al candidato a través de un formulario de cuatro etapas, calcula un perfil de manera interna y registra la postulación en Supabase.
+Aplicación web de postulación laboral para local gastronómico. Guía al candidato a través de un formulario de cuatro etapas, calcula un perfil de manera interna y registra la postulación en Supabase.
 
 El proyecto está hecho con HTML, CSS y JavaScript nativo: no requiere instalación de paquetes ni proceso de compilación.
 
